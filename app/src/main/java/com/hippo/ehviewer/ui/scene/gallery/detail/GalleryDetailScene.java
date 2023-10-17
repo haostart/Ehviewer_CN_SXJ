@@ -825,8 +825,13 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             // 将JSON对象转换为字符串
             requestData.put("gid", getGid());
 
-            String extractedText = (String) mTitle.getText();
-            requestData.put("gtitle", extractedText);
+            String titleJapn = "";
+            if(mGalleryInfo != null) {
+                titleJapn = mGalleryInfo.titleJpn;
+            }
+            requestData.put("gtitle", mGalleryInfo.title);
+            requestData.put("gtitleJpn", titleJapn);
+
             requestData.put("token", getToken());
             requestData.put("pwd", pwd);
 
