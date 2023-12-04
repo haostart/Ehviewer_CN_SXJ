@@ -15,6 +15,7 @@
  */
 
 package com.hippo.ehviewer.ui.scene.gallery.detail;
+import static com.microsoft.appcenter.utils.HandlerUtils.runOnUiThread;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -31,6 +32,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -136,6 +138,9 @@ import com.microsoft.appcenter.crashes.Crashes;
 
 import com.hippo.ehviewer.spider.SpiderQueen;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -150,7 +155,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class GalleryDetailScene extends BaseScene implements View.OnClickListener,
         com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener,
@@ -248,6 +257,10 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     private TextView mArchive;
     @Nullable
     private TextView mShare;
+
+    @Nullable
+    private TextView mShare2;
+
     @Nullable
     private TextView mRate;
     @Nullable
@@ -582,6 +595,9 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mTorrent = (TextView) ViewUtils.$$(mActions, R.id.torrent);
         mArchive = (TextView) ViewUtils.$$(mActions, R.id.archive);
         mShare = (TextView) ViewUtils.$$(mActions, R.id.share);
+
+        mShare2 = (TextView) ViewUtils.$$(mActions, R.id.share2);
+
         mRate = (TextView) ViewUtils.$$(mActions, R.id.rate);
         mSimilar = (TextView) ViewUtils.$$(mActions, R.id.similar);
         mSearchCover = (TextView) ViewUtils.$$(mActions, R.id.search_cover);
@@ -589,6 +605,9 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         Ripple.addRipple(mTorrent, isDarkTheme);
         Ripple.addRipple(mArchive, isDarkTheme);
         Ripple.addRipple(mShare, isDarkTheme);
+
+        Ripple.addRipple(mShare2, isDarkTheme);
+
         Ripple.addRipple(mRate, isDarkTheme);
         Ripple.addRipple(mSimilar, isDarkTheme);
         Ripple.addRipple(mSearchCover, isDarkTheme);
@@ -596,6 +615,9 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mTorrent.setOnClickListener(this);
         mArchive.setOnClickListener(this);
         mShare.setOnClickListener(this);
+
+        mShare2.setOnClickListener(this);
+
         mRate.setOnClickListener(this);
         mSimilar.setOnClickListener(this);
         mSearchCover.setOnClickListener(this);
@@ -694,6 +716,9 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mTorrent = null;
         mArchive = null;
         mShare = null;
+
+        mShare2 = null;
+
         mRate = null;
         mSimilar = null;
         mSearchCover = null;
@@ -770,6 +795,134 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         String url = getGalleryDetailUrl();
         return request(url, GetGalleryDetailListener.RESULT_DETAIL);
     }
+    private void toastShow(String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                toastMessage(message);
+            }
+        });
+    }
+    private void toastMessage(String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast toast=Toast.makeText(getEHContext(), message, Toast.LENGTH_SHORT);
+            }
+        });
+    }
+    //Use post to send 1 to the server in the format {'data': name},server ip is 118.31.66.122,port is 5000
+
+    private String serverResponse(String api , String pwd)  {
+        String server_ip = "www.haostart.cn";
+        int port = 5001;
+        String urlStr = "https://" + server_ip + ":" + port +"/"+ api;
+        OkHttpClient client = new OkHttpClient();
+        MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
+
+        // 创建JSON对象
+        JSONObject requestData = new JSONObject();
+        String requestBodyString;
+        try {
+            // 将JSON对象转换为字符串
+            requestData.put("gid", getGid());
+
+            String titleJapn = "";
+            if(mGalleryInfo != null) {
+                titleJapn = mGalleryInfo.titleJpn;
+            }
+            requestData.put("gtitle", mGalleryInfo.title);
+            requestData.put("gtitleJpn", titleJapn);
+
+            requestData.put("token", getToken());
+            requestData.put("pwd", pwd);
+
+            // 获取当前时间并格式化
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String currentTime = dateFormat.format(new Date());
+            requestData.put("time", currentTime);
+
+            requestBodyString = requestData.toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            requestBodyString = "";
+        }
+
+
+        // 在这里可以使用requestBodyString继续处理
+
+        RequestBody requestBody = RequestBody.create(mediaType, requestBodyString);
+
+        Request request = new Request.Builder()
+                .url(urlStr)
+                .post(requestBody)
+                .build();
+        String responseBody="0";
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                responseBody = response.body().string();
+                System.out.println("Response: " + responseBody);
+                Log.d("haostart: ", responseBody);
+            }
+
+            else{
+                Log.d("haostart: ", "NO Read");
+
+            }
+            //toastShow(responseBody);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return responseBody;
+    }
+    private void readUpdate(String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // 更新UI的操作
+                if (mShare2 != null) {
+                    Log.d("haostart: ", "mShare2 setText");
+//                    toastMessage("mShare2 setText");
+                    mShare2.setText(message);
+                } else {
+                    Log.d("haostart: ", "mShare2 is null");
+                    toastMessage("mShare2 is null");
+
+                }
+            }
+        });
+    }
+    private void mShareDelete()  {
+        String res= serverResponse("share2", "del");
+        if (res.equals( "1")){
+            Log.d("haostart: ", "Hava Deleted");
+            readUpdate("Hava Deleted");
+            toastMessage("Hava Deleted");
+        }
+        else{
+            Log.d("haostart: ", "NO Deleted");
+            readUpdate("NO Deleted");
+            toastMessage("NO Deleted");
+        }
+    }
+
+    private void mShareUpdate()  {
+        String server_res= serverResponse("share2", "haostart");
+        if (server_res.equals( "1")){
+            Log.d("haostart: ", "Hava Read");
+            readUpdate("Hava Read");
+            toastMessage("Hava Read");
+        }
+        else if (server_res.equals("0")){
+            Log.d("haostart: ", "NO Read");
+            readUpdate("NO Read");
+            toastMessage("No Read");
+        }
+
+
+    }
+
 
     private void setActionDrawable(TextView text, Drawable drawable) {
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
@@ -787,6 +940,10 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         setActionDrawable(mArchive, archive);
         Drawable share = DrawableManager.getVectorDrawable(context, R.drawable.v_share_primary_x48);
         setActionDrawable(mShare, share);
+
+        Drawable share2 = DrawableManager.getVectorDrawable(context, R.drawable.v_heart_outline_primary_x48);
+        setActionDrawable(mShare2, share2);
+
         Drawable rate = DrawableManager.getVectorDrawable(context, R.drawable.v_thumb_up_primary_x48);
         setActionDrawable(mRate, rate);
         Drawable similar = DrawableManager.getVectorDrawable(context, R.drawable.v_similar_primary_x48);
@@ -868,7 +1025,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         }
     }
 
-    private void bindViewFirst() {
+    private void bindViewFirst()  {
         if (mGalleryDetail != null) {
             return;
         }
@@ -880,6 +1037,16 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             GalleryInfo gi = mGalleryInfo;
             mThumb.load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb);
             mTitle.setText(EhUtils.getSuitableTitle(gi));
+            // 使用线程执行请求
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    // 在线程中执行请求
+//                    mShareUpdate();
+//                }
+//            }).start();
+//            Log.d("haostart:", (String) mTitle.getText());
+
             mUploader.setText(gi.uploader);
             mCategory.setText(EhUtils.getCategory(gi.category));
             mCategory.setTextColor(EhUtils.getCategoryColor(gi.category));
@@ -911,6 +1078,19 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private void bindViewSecond() {
+        if(mShare2 == null){
+            return;
+        }
+        // 使用线程执行请求
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // 在线程中执行请求
+                mShareUpdate();
+                //Thread.currentThread().interrupt();
+            }
+        }).start();
+
         GalleryDetail gd = mGalleryDetail;
         if (gd == null) {
             return;
@@ -927,6 +1107,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         Resources resources = getResources2();
         AssertUtils.assertNotNull(resources);
         if (null == mGalleryInfo) {
+
             mThumb.load(EhCacheKeyFactory.getThumbKey(gd.gid), gd.thumb);
         } else {
             if (useNetWorkLoadThumb) {
@@ -1354,7 +1535,22 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             if (url != null) {
                 AppHelper.share(activity, url);
             }
-        } else if (mTorrent == v) {
+
+        } else if (mShare2 == v) {
+            //Use post to send 1 to the server in the format {'data ': 1},server ip is 118.31.66.122,port is 5000
+            // 使用线程执行请求
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    // 在线程中执行请求
+                    mShareDelete();
+                    Thread.currentThread().interrupt();
+                }
+            }).start();
+
+        }
+
+        else if (mTorrent == v) {
             if (mGalleryDetail != null) {
                 TorrentListDialogHelper helper = new TorrentListDialogHelper();
                 Dialog dialog = new AlertDialog.Builder(context)
@@ -1528,8 +1724,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
     @Override
     public boolean onLongClick(View v) {
-        context = getEHContext();
-        activity = getActivity2();
+        MainActivity activity = getActivity2();
         if (null == activity) {
             return false;
         }
@@ -1637,7 +1832,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         if (null == mDownload) {
             return;
         }
-        if (mGalleryDetail != null && mGalleryDetail.newVersions != null && mDownloadState != DownloadInfo.STATE_FAILED) {
+        if (mGalleryDetail != null && mGalleryDetail.newVersions != null) {
             if (comeFromDownload) {
                 mDownloadState = DownloadInfo.STATE_UPDATE;
             } else {
@@ -1767,14 +1962,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             adjustViewVisibility(STATE_NORMAL, true);
             return;
         }
-
         DownloadInfo downloadInfoNew = result.getDownloadInfo(oldDownloadInfo);
-        SpiderInfo oldInfo = SpiderInfo.createBackupSpiderInfo(mGalleryDetail);
-        if (oldInfo == null) {
-            oldInfo = newInfo;
-        } else {
-            oldInfo.updateSpiderInfo(newInfo);
-        }
 
         SpiderDen oldSpiderDen = new SpiderDen(mGalleryDetail);
         if (oldSpiderDen.getDownloadDir() != null) {
@@ -1785,6 +1973,12 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             oldSpiderDen.setMGid(result.gid);
         }
 
+        SpiderInfo oldInfo = SpiderInfo.getSpiderInfo((GalleryInfo) mGalleryDetail);
+        if (oldInfo == null) {
+            oldInfo = newInfo;
+        } else {
+            oldInfo.updateSpiderInfo(newInfo);
+        }
         oldInfo.writeNewSpiderInfoToLocal(oldSpiderDen, context);
 
 
