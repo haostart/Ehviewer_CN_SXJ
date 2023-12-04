@@ -385,10 +385,6 @@
     <string name="download_sort_list">排序</string>
     <string name="download_filter_by_status">照狀態篩選</string>
     <string name="download_status_all">全部</string>
-    <string name="download_status_done">下載完成</string>
-    <string name="download_status_waiting">正在等待下載</string>
-    <string name="download_status_downloading">正在下載</string>
-    <string name="download_status_failed">下載失敗</string>
 
     <!-- Download label -->
     <string name="no_download_label">下載標籤將會顯示在這裡</string>
@@ -571,7 +567,7 @@
     <string name="settings_download_image_resolution_summary">%s，大於 1280x 的解析度可能不會生效</string>
     <string name="settings_download_image_resolution_auto">自動</string>
     <string name="settings_download_download_origin_image">下載原圖</string>
-    <string name="settings_download_download_origin_image_summary">這很危險！勾選這個選項會導致圖片流量配額快速耗用</string>
+    <string name="settings_download_download_origin_image_summary">這很危險！勾選這個選項會導致圖片流量配額與GP快速耗用</string>
     <string name="settings_download_download_order_by_asc">以升序下載</string>
     <string name="settings_download_download_order_by_asc_summary">當下載全部圖庫時照順序下載</string>
     <string name="settings_download_media_scan">允許其他程式進行媒體掃描</string>
