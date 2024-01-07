@@ -30,7 +30,7 @@ import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.ehviewer.client.data.FavListUrlBuilder;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.scene.gallery.list.GalleryListScene;
-import com.hippo.glgallery.GalleryView;
+import com.hippo.lib.glgallery.GalleryView;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.yorozuya.AssertUtils;
@@ -498,6 +498,17 @@ public class Settings {
 
     public static void putStartPosition(int value) {
         putIntToStr(KEY_START_POSITION, value);
+    }
+
+    private static final String KEY_START_TRANSFER_TIME = "start_transfer_time";
+    private static final int DEFAULT_START_TRANSFER_TIME = 2;
+
+    public static int getStartTransferTime() {
+        return getInt(KEY_START_TRANSFER_TIME, DEFAULT_START_TRANSFER_TIME);
+    }
+
+    public static void putStartTransferTime(int value) {
+        putInt(KEY_START_TRANSFER_TIME, value);
     }
 
     private static final String KEY_KEEP_SCREEN_ON = "keep_screen_on";

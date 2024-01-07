@@ -50,8 +50,8 @@ import com.hippo.ehviewer.client.parser.GalleryPageApiParser;
 import com.hippo.ehviewer.client.parser.GalleryPageParser;
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
 import com.hippo.ehviewer.gallery.GalleryProvider2;
-import com.hippo.glgallery.GalleryPageView;
-import com.hippo.glgallery.GalleryProvider;
+import com.hippo.lib.glgallery.GalleryPageView;
+import com.hippo.lib.glgallery.GalleryProvider;
 import com.hippo.image.Image;
 import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.streampipe.OutputStreamPipe;
@@ -204,6 +204,33 @@ public final class SpiderQueen implements Runnable {
         return queen;
     }
 
+    @UiThread
+    public static int findStartPage(@NonNull Context context, @NonNull GalleryInfo galleryInfo) {
+        SpiderInfo spiderInfo = null;
+        SimpleDiskCache msic;
+        EhApplication application = (EhApplication) context.getApplicationContext();
+        msic = EhApplication.getSpiderInfoCache(application);
+        InputStreamPipe pipe = msic.getInputStreamPipe(Long.toString(galleryInfo.gid));
+        if (null != pipe) {
+            try {
+                pipe.obtain();
+                spiderInfo = SpiderInfo.read(pipe.open());
+            } catch (IOException e) {
+                // Ignore
+                IOException exception = new IOException("读取失败",e);
+                Crashes.trackError(exception);
+            } finally {
+                pipe.close();
+                pipe.release();
+            }
+        }
+
+        int startPage = 0;
+        if (spiderInfo != null) {
+            startPage = spiderInfo.startPage;
+        }
+        return startPage;
+    }
     @UiThread
     public static void releaseSpiderQueen(@NonNull SpiderQueen queen, @Mode int mode) {
         OSUtils.checkMainLoop();
@@ -781,6 +808,7 @@ public final class SpiderQueen implements Runnable {
             return spiderInfo;
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
+            Crashes.trackError(e);
             return null;
         }
     }
@@ -1254,11 +1282,17 @@ public final class SpiderQueen implements Runnable {
                 referer = EhUrl.getPageUrl(gid, index, pToken);
                 if (Settings.getDownloadOriginImage() && !TextUtils.isEmpty(originImageUrl)) {
                     targetImageUrl = originImageUrl;
-                    String refNew;
+//                    String refNew;
+//                    if (targetImageUrl.contains("?")) {
+//                        refNew = referer + "&nl=" + skipHathKey;
+//                    } else {
+//                        refNew = referer + "?nl=" + skipHathKey;
+//                    }
+                    String refNew = referer;
                     if (targetImageUrl.contains("?")) {
-                        refNew = referer + "&nl=" + skipHathKey;
+                        targetImageUrl = targetImageUrl + "&nl=" + skipHathKey;
                     } else {
-                        refNew = referer + "?nl=" + skipHathKey;
+                        targetImageUrl = targetImageUrl + "?nl=" + skipHathKey;
                     }
 
                     Call call = mHttpImageClient.newBuilder()
@@ -1270,6 +1304,8 @@ public final class SpiderQueen implements Runnable {
                         targetImageUrl = response.header("location");
                     } catch (IOException e) {
                         error = "TargetImageUrl error";
+                        IOException ioException = new IOException("原图链接获取失败",e);
+                        Crashes.trackError(ioException);
                         break;
                     }
                 } else {
