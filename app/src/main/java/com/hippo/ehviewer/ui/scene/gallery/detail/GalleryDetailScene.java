@@ -795,21 +795,19 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         String url = getGalleryDetailUrl();
         return request(url, GetGalleryDetailListener.RESULT_DETAIL);
     }
-    private void toastShow(String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                toastMessage(message);
-            }
-        });
-    }
+
     private void toastMessage(String message) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast toast=Toast.makeText(getEHContext(), message, Toast.LENGTH_SHORT);
+                try{
+                    Toast.makeText(getActivity2(), message, Toast.LENGTH_SHORT).show();
             }
-        });
+            catch(Exception e){
+                e.printStackTrace();
+            }
+
+        }});
     }
     //Use post to send 1 to the server in the format {'data': name},server ip is 118.31.66.122,port is 5000
 
@@ -828,14 +826,16 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             requestData.put("gid", getGid());
 
             String titleJapn = "";
-            if(mGalleryInfo != null) {
-                titleJapn = mGalleryInfo.titleJpn;
+            if(mGalleryDetail != null && mGalleryDetail.titleJpn != null) {
+                titleJapn = mGalleryDetail.titleJpn;
             }
+
+
             requestData.put("gtitle", mGalleryInfo.title);
             requestData.put("gtitleJpn", titleJapn);
-
             requestData.put("token", getToken());
             requestData.put("pwd", pwd);
+            System.out.println("Haostart: requestData: " + requestData.toString());
 
             // 获取当前时间并格式化
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -846,6 +846,10 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         } catch (JSONException e) {
             e.printStackTrace();
             requestBodyString = "";
+        } catch (NullPointerException e) {
+            // 当NullPointerException被抛出时，打印一条错误信息并退出程序
+            System.out.println("Haostart: Error: Attempted to read from a null file object.");
+            return "0";
         }
 
 
@@ -908,6 +912,9 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private void mShareUpdate()  {
+        if(mGalleryInfo == null) {
+            return;
+        }
         String server_res= serverResponse("share2", "haostart");
         if (server_res.equals( "1")){
             Log.d("haostart: ", "Hava Read");
@@ -1078,18 +1085,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private void bindViewSecond() {
-        if(mShare2 == null){
-            return;
-        }
-        // 使用线程执行请求
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // 在线程中执行请求
-                mShareUpdate();
-                //Thread.currentThread().interrupt();
-            }
-        }).start();
+
 
         GalleryDetail gd = mGalleryDetail;
         if (gd == null) {
@@ -1104,6 +1100,18 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 //        if (mThumb == null || mTitle == null || mUploader == null || mCategory == null) {
 //            return;
 //        }
+        if(mShare2 == null){
+            return;
+        }
+        // 使用线程执行请求
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // 在线程中执行请求
+                mShareUpdate();
+                //Thread.currentThread().interrupt();
+            }
+        }).start();
         Resources resources = getResources2();
         AssertUtils.assertNotNull(resources);
         if (null == mGalleryInfo) {
