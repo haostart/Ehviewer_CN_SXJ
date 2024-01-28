@@ -73,7 +73,6 @@ import com.hippo.yorozuya.SimpleHandler;
 import org.conscrypt.Conscrypt;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.security.KeyStore;
 import java.security.Security;
 import java.util.ArrayList;
@@ -110,6 +109,8 @@ public class EhApplication extends RecordingApplication {
 
     private final IntIdGenerator mIdGenerator = new IntIdGenerator();
     private final HashMap<Integer, Object> mGlobalStuffMap = new HashMap<>();
+
+    private final HashMap<String, Object> mTempCacheMap = new HashMap<>();
 
     private EhCookieStore mEhCookieStore;
     private EhClient mEhClient;
@@ -309,6 +310,23 @@ public class EhApplication extends RecordingApplication {
 
     public Object removeGlobalStuff(int id) {
         return mGlobalStuffMap.remove(id);
+    }
+
+    public String putTempCache(@NonNull String key,@NonNull Object o) {
+        mTempCacheMap.put(key, o);
+        return key;
+    }
+
+    public boolean containTempCache(@NonNull String key) {
+        return mTempCacheMap.containsKey(key);
+    }
+
+    public Object getTempCache(@NonNull String key) {
+        return mTempCacheMap.get(key);
+    }
+
+    public Object removeTempCache(@NonNull String key) {
+        return mTempCacheMap.remove(key);
     }
 
     public void removeGlobalStuff(Object o) {
@@ -573,7 +591,7 @@ public class EhApplication extends RecordingApplication {
 
     @NonNull
     public static String getDeveloperEmail() {
-        return "ehviewersu$gmail.com".replace('$', '@');
+        return "xiaojieonly$foxmail.com".replace('$', '@');
     }
 
     public void registerActivity(Activity activity) {
@@ -654,8 +672,6 @@ public class EhApplication extends RecordingApplication {
     /**
      * 将用户订阅标签列表存入内存缓存
      *
-     * @param context
-     * @param userTagList
      */
     public static void saveUserTagList(@NonNull Context context, UserTagList userTagList) {
         EhApplication application = ((EhApplication) context.getApplicationContext());
@@ -665,8 +681,6 @@ public class EhApplication extends RecordingApplication {
     /**
      * 从内存缓存中获取用户订阅标签列表
      *
-     * @param context
-     * @return
      */
     public static UserTagList getUserTagList(@NonNull Context context) {
         EhApplication application = ((EhApplication) context.getApplicationContext());
@@ -705,7 +719,6 @@ public class EhApplication extends RecordingApplication {
     /**
      * 显示eh事件
      *
-     * @param result
      */
     public void showEventPane(EhNewsDetail result) {
         ehNewsDetail = result;

@@ -49,7 +49,7 @@ public class EhDns implements Dns {
     static {
         Map<String, List<InetAddress>> map = new HashMap<>();
         if (Settings.getBuiltInHosts()){
-            put(map, "e-hentai.org",  "104.20.135.21","104.20.134.21","172.67.0.127","104.20.26.25","178.162.139.18");
+            put(map, "e-hentai.org",  "104.20.135.21","104.20.134.21","172.67.0.127");
             put(map, "repo.e-hentai.org", "94.100.28.57", "94.100.29.73");
             put(map, "forums.e-hentai.org", "94.100.18.243");
             put(map, "ehgt.org", "37.48.89.44", "81.171.10.48", "178.162.139.24", "178.162.140.212"
@@ -83,20 +83,7 @@ public class EhDns implements Dns {
         hosts = EhApplication.getHosts(context);
         DnsOverHttps.Builder builder = new DnsOverHttps.Builder()
                 .client(new OkHttpClient.Builder().cache(EhApplication.getOkHttpCache(context)).build())
-                .url(HttpUrl.get("https://cloudflare-dns.com/dns-query"));
-        try {
-            builder.bootstrapDnsHosts(InetAddress.getByName("162.159.36.1"),
-                    InetAddress.getByName("162.159.46.1"),
-                    InetAddress.getByName("1.1.1.1"),
-                    InetAddress.getByName("1.0.0.1"),
-                    InetAddress.getByName("162.159.132.53"),
-                    InetAddress.getByName("2606:4700:4700::1111"),
-                    InetAddress.getByName("2606:4700:4700::1001"),
-                    InetAddress.getByName("2606:4700:4700::0064"),
-                    InetAddress.getByName("2606:4700:4700::6400"));
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+                .url(HttpUrl.get("https://77.88.8.1/dns-query"));
         dnsOverHttps = builder.post(true).build();
     }
 

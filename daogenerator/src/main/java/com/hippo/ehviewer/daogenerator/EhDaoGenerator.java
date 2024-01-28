@@ -46,9 +46,15 @@ public class EhDaoGenerator {
 
     public static void generate() throws Exception {
         Utilities.deleteContents(new File(DELETE_DIR));
-        File outDir = new File(OUT_DIR);
-        outDir.delete();
-        outDir.mkdirs();
+        File absFile = new File("");
+        String absPath = absFile.getAbsolutePath()+"/"+OUT_DIR;
+        File outDir = new File(absPath);
+        if(!outDir.delete()){
+            outDir.deleteOnExit();
+        }
+        if (!outDir.mkdirs()){
+            throw new Exception("创建文件失败");
+        }
 
         Schema schema = new Schema(VERSION, PACKAGE);
         addGalleryTags(schema);
@@ -386,7 +392,7 @@ public class EhDaoGenerator {
                 "\t\tthis.rating = galleryInfo.rating;\n" +
                 "\t\tthis.simpleTags = galleryInfo.simpleTags;\n" +
                 "\t\tthis.simpleLanguage = galleryInfo.simpleLanguage;\n" +
-                "\t}").setConstructor(true);
+                "\t}");
         javaClass.addImport("com.hippo.ehviewer.client.data.GalleryInfo");
 
         javaClass.addMethod("\tpublic JSONObject toJson(){\n" +
