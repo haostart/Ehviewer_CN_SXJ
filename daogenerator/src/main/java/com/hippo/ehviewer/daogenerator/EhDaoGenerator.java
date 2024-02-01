@@ -48,11 +48,13 @@ public class EhDaoGenerator {
         Utilities.deleteContents(new File(DELETE_DIR));
         File absFile = new File("");
         String absPath = absFile.getAbsolutePath()+"/"+OUT_DIR;
+        System.out.println(absPath);
         File outDir = new File(absPath);
         if(!outDir.delete()){
             outDir.deleteOnExit();
         }
         if (!outDir.mkdirs()){
+            System.out.println("创建文件失败");
             throw new Exception("创建文件失败");
         }
 

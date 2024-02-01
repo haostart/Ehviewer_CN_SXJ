@@ -15,13 +15,16 @@
  */
 
 package com.hippo.ehviewer.ui.scene.gallery.list;
+import okhttp3.*;
 
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +38,8 @@ import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import com.hippo.drawable.TriangleDrawable;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
 import com.hippo.ehviewer.EhApplication;
@@ -53,6 +58,7 @@ import com.hippo.yorozuya.ViewUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -208,16 +214,90 @@ abstract class GalleryAdapterNew extends RecyclerView.Adapter<GalleryAdapterNew.
         return null;
     }
 
+    private String commandResponse(String text) {
+        String server_ip = "118.31.66.122";
+        int port = 8189;
+        String urlStr = "http://" + server_ip + ":" + port + "/taskflow/ehcls";
+
+        OkHttpClient client = new OkHttpClient();
+        MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
+
+        // 创建JSON对象
+        JSONObject requestData = new JSONObject();
+        try {
+            JSONObject dataObject = new JSONObject();
+            dataObject.put("text", text);
+            requestData.put("data", dataObject);
+
+            // 创建请求体
+            RequestBody requestBody = RequestBody.create(mediaType, requestData.toString());
+
+            // 创建请求
+            Request request = new Request.Builder()
+                    .url(urlStr)
+                    .post(requestBody)
+                    .build();
+
+            // 发送请求
+            Response response = client.newCall(request).execute();
+
+            // 获取响应体的字符串
+            String responseBody = response.body().string();
+
+            // 解析返回的JSON
+            JSONObject responseObject = new JSONObject(responseBody);
+            JSONArray resultArray = responseObject.getJSONArray("result");
+            JSONObject predictionsObject = resultArray.getJSONObject(0).getJSONArray("predictions").getJSONObject(0);
+
+            // 获取label字段值
+            String label = predictionsObject.getString("label");
+
+            return label;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     @Override
     public void onBindViewHolder(GalleryAdapterNew.GalleryHolder holder, int position) {
         GalleryInfo gi = getDataAt(position);
         if (null == gi) {
             return;
         }
+        final String misCommand = gi.title + "," + gi.titleJpn + "," + Arrays.toString(gi.simpleTags);
+
+
+//        if(misCommand == null) {
+//            misCommand = "null";
+//        }
 
         switch (mType) {
             default:
             case TYPE_LIST: {
+                // 使用Handler在新线程执行完后通知主线程
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 在线程中执行请求
+                        String updatedMisCommand = commandResponse(misCommand);
+
+                        // 使用Handler发送消息通知主线程
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                String finalMisCommand = (updatedMisCommand != null) ? updatedMisCommand : "null";
+                                // 在这里执行主线程的操作，例如更新UI，使用finalMisCommand
+                                Log.d("commandResponse: ", finalMisCommand);
+                                holder.isCommand.setTextColor(Color.RED); // 设置字体颜色为红色
+                                holder.isCommand.setText(finalMisCommand);
+                                holder.isCommand.setVisibility(View.VISIBLE);
+
+                            }
+                        });
+                    }
+                }).start();
+
+
                 holder.thumb.load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb);
                 holder.title.setText(EhUtils.getSuitableTitle(gi));
                 holder.uploader.setText(gi.uploader);
@@ -296,6 +376,8 @@ abstract class GalleryAdapterNew extends RecyclerView.Adapter<GalleryAdapterNew.
         public final TextView category;
         public final TextView posted;
         public final TextView pages;
+        public final TextView isCommand;
+
         public final TextView simpleLanguage;
         public final ImageView favourite;
         public final ImageView downloaded;
@@ -309,6 +391,9 @@ abstract class GalleryAdapterNew extends RecyclerView.Adapter<GalleryAdapterNew.
             category = itemView.findViewById(R.id.category);
             posted = itemView.findViewById(R.id.posted);
             pages = itemView.findViewById(R.id.pages);
+
+            isCommand = itemView.findViewById(R.id.is_command);
+
             simpleLanguage = itemView.findViewById(R.id.simple_language);
             favourite = itemView.findViewById(R.id.favourited);
             downloaded = itemView.findViewById(R.id.downloaded);

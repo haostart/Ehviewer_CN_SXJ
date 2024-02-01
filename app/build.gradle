@@ -94,6 +94,9 @@ task copyNotice(type: Copy) {
 tasks.withType(JavaCompile) {
     task -> task.dependsOn copyNotice
 }
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
 
 clean {
     delete file('src/main/assets/NOTICE.html').absolutePath
