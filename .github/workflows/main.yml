@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        repository: https://github.com/xiaojieonly/Ehviewer_CN_SXJ # 上游仓库的URL
+        repository: xiaojieonly/Ehviewer_CN_SXJ # 上游仓库的URL
         ref: BiLi_PC_Gamer # 上游仓库的分支
 
 
