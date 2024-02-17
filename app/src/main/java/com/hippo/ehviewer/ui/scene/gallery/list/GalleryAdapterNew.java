@@ -215,9 +215,9 @@ abstract class GalleryAdapterNew extends RecyclerView.Adapter<GalleryAdapterNew.
     }
 
     private String commandResponse(String text) {
-        String server_ip = "118.31.66.122";
-        int port = 8189;
-        String urlStr = "http://" + server_ip + ":" + port + "/taskflow/ehcls";
+        String server_ip = "haostart.cn";
+        int port = 5001;
+        String urlStr = "https://" + server_ip + ":" + port + "/ehviewer_like";
 
         OkHttpClient client = new OkHttpClient();
         MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
