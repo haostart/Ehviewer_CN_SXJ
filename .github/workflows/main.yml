@@ -1,0 +1,22 @@
+name: Update Fork on Push
+
+on:
+  push:
+    branches: BiLi_PC_Gamer # 上游仓库的分支名
+
+jobs:
+  update-fork:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: xiaojieonly/Ehviewer_CN_SXJ # 上游仓库的URL
+        ref: BiLi_PC_Gamer # 上游仓库的分支
+
+
+    - name: Pull changes from upstream
+      run: |
+        git fetch origin
+        git checkout BiLi_PC_Gamer
+        git pull origin BiLi_PC_Gamer
+
