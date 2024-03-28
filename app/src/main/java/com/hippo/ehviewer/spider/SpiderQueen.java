@@ -67,7 +67,7 @@ import com.hippo.yorozuya.Utilities;
 import com.hippo.yorozuya.collect.SparseJLArray;
 import com.hippo.yorozuya.thread.PriorityThread;
 import com.hippo.yorozuya.thread.PriorityThreadFactory;
-import com.microsoft.appcenter.crashes.Crashes;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -599,7 +599,7 @@ public final class SpiderQueen implements Runnable {
                    mWorkerPoolExecutor.execute(new SpiderWorker());
                }
            }catch (OutOfMemoryError outOfMemoryError){
-               Crashes.trackError(outOfMemoryError);
+               FirebaseCrashlytics.getInstance().recordException(outOfMemoryError);
                notifyFinish();
            }
         }
@@ -807,7 +807,7 @@ public final class SpiderQueen implements Runnable {
             return spiderInfo;
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
-            Crashes.trackError(e);
+            FirebaseCrashlytics.getInstance().recordException(e);
             return null;
         }
     }
@@ -1287,7 +1287,6 @@ public final class SpiderQueen implements Runnable {
 //                    } else {
 //                        refNew = referer + "?nl=" + skipHathKey;
 //                    }
-                    String refNew = referer;
                     if (targetImageUrl.contains("?")) {
                         targetImageUrl = targetImageUrl + "&nl=" + skipHathKey;
                     } else {
@@ -1296,7 +1295,7 @@ public final class SpiderQueen implements Runnable {
 
                     Call call = mHttpImageClient.newBuilder()
                             .callTimeout(0, TimeUnit.SECONDS).build()
-                            .newCall(new EhRequestBuilder(targetImageUrl, refNew).build());
+                            .newCall(new EhRequestBuilder(targetImageUrl, referer).build());
                     Response response;
                     try {
                         response = call.execute();
@@ -1304,7 +1303,7 @@ public final class SpiderQueen implements Runnable {
                     } catch (IOException e) {
                         error = "TargetImageUrl error";
                         IOException ioException = new IOException("原图链接获取失败",e);
-                        Crashes.trackError(ioException);
+                        FirebaseCrashlytics.getInstance().recordException(ioException);
                         break;
                     }
                 } else {
@@ -1743,7 +1742,7 @@ public final class SpiderQueen implements Runnable {
                             UniFile pTokenFile = backUpDir.createFile(pTokenFileName);
                             FileUtils.copyFile(image, pTokenFile, true);
                         } catch (NullPointerException e) {
-                            Crashes.trackError(e);
+                            FirebaseCrashlytics.getInstance().recordException(e);
                         }
                         image.delete();
                         return false;
@@ -1759,7 +1758,7 @@ public final class SpiderQueen implements Runnable {
                     try {
                         oldInfo.write(backupFile.openOutputStream());
                     } catch (IOException e) {
-                        Crashes.trackError(e);
+                        FirebaseCrashlytics.getInstance().recordException(e);
                     }
                 }
             }
@@ -1783,7 +1782,7 @@ public final class SpiderQueen implements Runnable {
                         image.delete();
                         return true;
                     } catch (NullPointerException e) {
-                        Crashes.trackError(e);
+                        FirebaseCrashlytics.getInstance().recordException(e);
                         return false;
                     }
                 }

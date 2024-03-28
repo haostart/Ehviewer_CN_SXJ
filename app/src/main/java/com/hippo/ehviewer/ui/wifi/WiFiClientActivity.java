@@ -48,6 +48,7 @@ import com.hippo.ehviewer.dao.DownloadInfo;
 import com.hippo.ehviewer.dao.QuickSearch;
 import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.util.PermissionRequester;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -277,8 +278,12 @@ public class WiFiClientActivity extends AppCompatActivity {
         DownloadManager manager = EhApplication.getDownloadManager();
         new Thread(()->{
             for (int i = 0; i < jsonArray.size(); i++) {
-                DownloadInfo info = DownloadInfo.downloadInfoFromJson(jsonArray.getJSONObject(i));
-                manager.addDownloadInfo(info,info.label);
+               try{
+                   DownloadInfo info = DownloadInfo.downloadInfoFromJson(jsonArray.getJSONObject(i));
+                   manager.addDownloadInfo(info,info.label);
+               }catch (ClassCastException e){
+                   FirebaseCrashlytics.getInstance().recordException(e);
+               }
             }
             connectThread.dataProcessed(response);
             updateReceiveMessage(getString(R.string.wifi_server_receive_message, response.toString()));

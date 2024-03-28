@@ -173,6 +173,7 @@ public final class GalleryListScene extends BaseScene
 
     private static final long ANIMATE_TIME = 300L;
 
+    private boolean showReadProgress = false;
     private boolean filterOpen = false;
     private final List<String> filterTagList = new ArrayList<>();
 
@@ -416,6 +417,7 @@ public final class GalleryListScene extends BaseScene
         } else {
             onRestore(savedInstanceState);
         }
+        showReadProgress = Settings.getShowReadProgress();
     }
 
     public void onInit() {
@@ -1142,6 +1144,9 @@ public final class GalleryListScene extends BaseScene
     }
     @Override
     public void onBackPressed() {
+        if (popupWindow!=null){
+            popupWindow.dismiss();
+        }
         if (null != mShowcaseView) {
             return;
         }
@@ -1961,7 +1966,7 @@ public final class GalleryListScene extends BaseScene
 
         public GalleryListAdapter(@NonNull LayoutInflater inflater,
                                   @NonNull Resources resources, @NonNull RecyclerView recyclerView, int type) {
-            super(inflater, resources, recyclerView, type, true, executorService);
+            super(inflater, resources, recyclerView, type, true, executorService,showReadProgress);
         }
 
         @Override

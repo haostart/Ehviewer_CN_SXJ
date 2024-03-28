@@ -662,8 +662,8 @@
     <string name="no_archives">ยังไม่มีไฟล์บีบอัด</string>
     <string name="download_archive_started">เริ่มการดาวน์โหลดบีบอัด</string>
     <string name="download_archive_failure">การดาวน์โหลดไฟล์บีบอัดล้มเหลว</string>
-    <string name="archive">การบีบอัด</string>
-    <string name="download_archive_failure_no_hath">ต้องการ H@H client เพื่อโหลดไฟล์บีบอัด</string>
+    <string name="h_h">H@H</string>
+    <string name="download_h_h_failure_no_hath">ต้องการ H@H client เพื่อโหลดไฟล์บีบอัด</string>
     <string name="settings_privacy">ความเป็นส่วนตัว</string>
     <string name="settings_privacy_secure">ป้องกันการบันทึกภาพหน้าจอ</string>
     <string name="settings_privacy_secure_summary">ป้องกันเนื้อหาต่างๆของตัวแอปจากการถูกบันทึกหน้าจอ หรือถูกแสดงในหน้ารายการ \"แอพล่าสุด\" ตอนสลับหรือระหว่างสลับไปแอปอื่น.</string>
@@ -680,5 +680,26 @@
     <string name="cleanup_toplists">ล้างข้อมูล อันดับ</string>
     <string name="rating_reviewing_toplists">การจัด อันดับ&#038;กำลังตรวจสอบ อันดับ</string>
     <string name="top_list">อันดับ</string>
+    <string name="settings_eh_list_show_read_progress">Show reading progress</string>
+    <string name="settings_eh_list_show_read_progress_summary">Display reading progress for each gallery in detail list mode</string>
+    <string name="cookie_login_import_in_clipboard">Import from clipboard</string>
+    <string name="no_cookie_in_clipboard">No valid data found from clipboard</string>
+    <string name="gallery_update_dialog_title">Update method</string>
+    <string name="gallery_update_dialog_message"><![CDATA[Overwrite old gallery: Only the downloaded version will be kept, the old version will be deleted.&#xA;Download as new gallery: The downloaded gallery will exist as a new gallery, and both the new gallery and the old gallery will be saved.]]></string>
+    <string name="gallery_update_download_as_new">Download as new</string>
+    <string name="gallery_update_override_old">Overwrite old</string>
+    <string name="loading_db_file">Data Loading …</string>
+    <string name="settings_eh_history_size">Number of historical records</string>
+    <string name="history_info_unlimited">Unlimited</string>
+    <string name="archiver">Archiver</string>
+    <string name="archiver_dialog_current_funds">Current Funds:</string>
+    <string name="archiver_dialog_download_original">Download Original Archive</string>
+    <string name="archiver_dialog_download_resample">Download Resample Archive</string>
+    <string name="archiver_dialog_size">Estimated Size:  %s</string>
+    <string name="dialog_archiver_title">Archiver Downloader</string>
+    <string name="download_receiver_label">EhViewer Download Receiver</string>
+    <string name="decompressed_successfully">Decompressed successfully!</string>
+    <string name="decompression_failed">Decompression failed!</string>
+    <string name="download_label_archiver">Archiver</string>
 
 </resources>

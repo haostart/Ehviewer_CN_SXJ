@@ -487,6 +487,8 @@
     <string name="settings_eh_list_mode">列表模式</string>
     <string name="settings_eh_list_mode_detail">详情</string>
     <string name="settings_eh_list_mode_thumb">缩略图</string>
+    <string name="settings_eh_list_show_read_progress">显示阅读进度</string>
+    <string name="settings_eh_list_show_read_progress_summary">在详情列表模式下显示每个画廊的阅读进度</string>
     <string name="settings_eh_detail_size">详情大小</string>
     <string name="settings_eh_detail_size_long">长</string>
     <string name="settings_eh_detail_size_short">短</string>
@@ -569,6 +571,8 @@
     <string name="settings_download_image_resolution_summary">%s，大于 1280x 的分辨率可能不好使</string>
     <string name="settings_download_image_resolution_auto">自动</string>
     <string name="settings_download_download_origin_image">下载原图</string>
+    <string name="settings_download_download_list_pagination">列表分页</string>
+    <string name="settings_download_download_list_pagination_summary">在列表长度大于500时分页功能才会生效</string>
     <string name="settings_download_download_origin_image_summary">这很危险！勾选此项会导致下载配额与GP迅速流失</string>
     <string name="settings_download_download_order_by_asc">正序下载</string>
     <string name="settings_download_download_order_by_asc_summary">下载全部画廊时正序下载</string>
@@ -792,8 +796,8 @@
     <string name="no_archives">没有压缩包</string>
     <string name="download_archive_started">开始下载压缩包</string>
     <string name="download_archive_failure">无法下载压缩包</string>
-    <string name="archive">压缩包</string>
-    <string name="download_archive_failure_no_hath">下载压缩包需要 H@H 客户端</string>
+    <string name="h_h">H@H</string>
+    <string name="download_h_h_failure_no_hath">下载压缩包需要 H@H 客户端</string>
     <string name="settings_privacy">隐私</string>
     <string name="settings_privacy_secure">不允许屏幕抓取</string>
     <string name="settings_privacy_secure_summary">启用后，将不能截取该应用的屏幕截图，同时，将不会在系统任务切换器中显示该应用的内容预览\n\n重新启动应用以生效此更改</string>
@@ -893,5 +897,24 @@
 
     <string name="pagination_count">共</string>
     <string name="pagination_page_and_item">条/页</string>
+    <string name="cookie_login_import_in_clipboard">从剪切板导入</string>
+    <string name="no_cookie_in_clipboard">未从剪切板中找到有效数据</string>
+    <string name="gallery_update_dialog_title">更新方式</string>
+    <string name="gallery_update_dialog_message">覆盖旧画廊：只保留下载版本，旧版本将被删除。\n下载为新画廊：下载画廊将以新画廊形式存在，新画廊与旧画廊均会被保存。</string>
+    <string name="gallery_update_download_as_new">下载为新</string>
+    <string name="gallery_update_override_old">覆盖下载</string>
+    <string name="loading_db_file">数据加载中 …</string>
+    <string name="settings_eh_history_size">历史记录数量</string>
+    <string name="history_info_unlimited">无限制</string>
+    <string name="archiver">档案</string>
+    <string name="archiver_dialog_current_funds">当前拥有:</string>
+    <string name="archiver_dialog_download_original">下载原始档案</string>
+    <string name="archiver_dialog_download_resample">下载压缩档案</string>
+    <string name="archiver_dialog_size">预计大小:  %s</string>
+    <string name="dialog_archiver_title">档案下载</string>
+    <string name="download_receiver_label">EhViewer 下载接收</string>
+    <string name="decompressed_successfully">解压成功！</string>
+    <string name="decompression_failed">解压失败！</string>
+    <string name="download_label_archiver">档案</string>
 
 </resources>

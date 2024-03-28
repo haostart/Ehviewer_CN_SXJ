@@ -1350,4 +1350,40 @@ public class Settings {
         putBoolean(KEY_DOWNLOAD_ORDER_ASC, value);
     }
 
+    public static final String KEY_DOWNLOAD_LIST_PAGINATION = "download_list_pagination";
+
+    private static boolean IS_DOWNLOAD_LIST_PAGINATION = true;
+
+    public static boolean getDownloadPagination() {
+        return getBoolean(KEY_DOWNLOAD_LIST_PAGINATION, IS_DOWNLOAD_LIST_PAGINATION) ;
+    }
+
+    public static void setDownloadPagination(boolean value) {
+        putBoolean(KEY_DOWNLOAD_LIST_PAGINATION, value);
+    }
+
+    public static final String KEY_SHOW_READ_PROGRESS = "show_read_progress";
+
+    private static boolean IS_SHOW_READ_PROGRESS = true;
+
+    public static boolean getShowReadProgress() {
+        return getBoolean(KEY_SHOW_READ_PROGRESS, IS_SHOW_READ_PROGRESS) ;
+    }
+
+    public static void setShowReadProgress(boolean value) {
+        putBoolean(KEY_SHOW_READ_PROGRESS, value);
+    }
+
+    public static final String KEY_HISTORY_INFO_SIZE = "history_info_size";
+
+    private static int DEFAULT_HISTORY_INFO_SIZE = 100;
+
+    public static int getHistoryInfoSize() {
+        return getIntFromStr(KEY_HISTORY_INFO_SIZE, DEFAULT_HISTORY_INFO_SIZE) ;
+    }
+
+    public static void setHistoryInfoSize(int value) {
+        putIntToStr(KEY_HISTORY_INFO_SIZE, value);
+    }
+
 }

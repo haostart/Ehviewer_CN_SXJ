@@ -785,13 +785,34 @@
     <string name="no_archives">No Archives</string>
     <string name="download_archive_started">Archive download started</string>
     <string name="download_archive_failure">Failed to download archive</string>
-    <string name="archive">Archive</string>
-    <string name="download_archive_failure_no_hath">Need H@H client for archive download</string>
+    <string name="h_h">H@H</string>
+    <string name="download_h_h_failure_no_hath">Need H@H client for archive download</string>
     <string name="settings_privacy">Privacy</string>
     <string name="settings_privacy_secure">Prevent screenshots</string>
     <string name="settings_privacy_secure_summary">Prevent the content of the app from being taken screenshots of or shown in the \"Recent Apps\" list.</string>
 
     <string name="download_service">Download Service</string>
     <string name="favorite_name">Favorite</string>
+    <string name="settings_eh_list_show_read_progress">Show reading progress</string>
+    <string name="settings_eh_list_show_read_progress_summary">Display reading progress for each gallery in detail list mode</string>
+    <string name="cookie_login_import_in_clipboard">Import from clipboard</string>
+    <string name="no_cookie_in_clipboard">No valid data found from clipboard</string>
+    <string name="gallery_update_dialog_title">Update method</string>
+    <string name="gallery_update_dialog_message">Overwrite old gallery: Only the downloaded version will be kept, the old version will be deleted.\nDownload as new gallery: The downloaded gallery will exist as a new gallery, and both the new gallery and the old gallery will be saved.</string>
+    <string name="gallery_update_download_as_new">Download as new</string>
+    <string name="gallery_update_override_old">Overwrite old</string>
+    <string name="loading_db_file">Data Loading …</string>
+    <string name="settings_eh_history_size">Number of historical records</string>
+    <string name="history_info_unlimited">Unlimited</string>
+    <string name="archiver">Archiver</string>
+    <string name="archiver_dialog_current_funds">Current Funds:</string>
+    <string name="archiver_dialog_download_original">Download Original Archive</string>
+    <string name="archiver_dialog_download_resample">Download Resample Archive</string>
+    <string name="archiver_dialog_size">Estimated Size:  %s</string>
+    <string name="dialog_archiver_title">Archiver Downloader</string>
+    <string name="download_receiver_label">EhViewer Download Receiver</string>
+    <string name="decompressed_successfully">Decompressed successfully!</string>
+    <string name="decompression_failed">Decompression failed!</string>
+    <string name="download_label_archiver">Archiver</string>
 
 </resources>

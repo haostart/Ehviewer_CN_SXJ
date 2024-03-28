@@ -29,7 +29,7 @@ import java.io.FileWriter;
 public class EhDaoGenerator {
 
     private static final String PACKAGE = "com.hippo.ehviewer.dao";
-    private static final String OUT_DIR = "../app/src/main/java-gen";
+    private static final String OUT_DIR = "app/src/main/java";
     private static final String DELETE_DIR = OUT_DIR+"/com/hippo/ehviewer/dao";
 
     private static final int VERSION = 6;
@@ -408,7 +408,7 @@ public class EhDaoGenerator {
                 "\t}");
         javaClass.addImport("com.alibaba.fastjson.JSONObject");
 
-        javaClass.addMethod("\tpublic static DownloadInfo downloadInfoFromJson(JSONObject object){\n" +
+        javaClass.addMethod("\tpublic static DownloadInfo downloadInfoFromJson(JSONObject object) throws ClassCastException {\n" +
                 "\t\tDownloadInfo downloadInfo = (DownloadInfo) GalleryInfo.galleryInfoFromJson(object);\n" +
                 "\t\tdownloadInfo.finished = object.getIntValue(\"finished\");\n" +
                 "\t\tdownloadInfo.legacy = object.getIntValue(\"legacy\");\n" +

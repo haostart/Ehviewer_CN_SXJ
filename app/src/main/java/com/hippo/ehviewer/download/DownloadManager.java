@@ -19,6 +19,8 @@ package com.hippo.ehviewer.download;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -43,7 +45,7 @@ import com.hippo.yorozuya.SimpleHandler;
 import com.hippo.yorozuya.collect.LongList;
 import com.hippo.yorozuya.collect.SparseIJArray;
 import com.hippo.yorozuya.collect.SparseJLArray;
-import com.microsoft.appcenter.crashes.Crashes;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -213,7 +215,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
                 return 0;
             }
         } catch (NullPointerException e) {
-            Crashes.trackError(e);
+            FirebaseCrashlytics.getInstance().recordException(e);
             return 0;
         }
     }
@@ -494,7 +496,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
         for (DownloadInfo info : downloadInfoList) {
             if (containDownloadInfo(info.gid)) {
                 // Contain
-                return;
+                continue;
             }
 
             // Ensure download state
@@ -530,9 +532,11 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
         Collections.sort(mAllInfoList, DATE_DESC_COMPARATOR);
 
         // Notify
-        for (DownloadInfoListener l : mDownloadInfoListeners) {
-            l.onReload();
-        }
+        new Handler(Looper.getMainLooper()).post(() -> {
+            for (DownloadInfoListener l : mDownloadInfoListeners) {
+                l.onReload();
+            }
+        });
     }
 
     public void addDownloadLabel(List<DownloadLabel> downloadLabelList) {
@@ -545,7 +549,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
         }
     }
 
-    public void addDownload(GalleryInfo galleryInfo, @Nullable String label) {
+    public void addDownload(GalleryInfo galleryInfo, @Nullable String label,int state) {
         if (containDownloadInfo(galleryInfo.gid)) {
             // Contain
             return;
@@ -554,7 +558,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
         // It is new download info
         DownloadInfo info = new DownloadInfo(galleryInfo);
         info.label = label;
-        info.state = DownloadInfo.STATE_NONE;
+        info.state = state;
         info.time = System.currentTimeMillis();
 
         // Add to label download list
@@ -576,6 +580,10 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
         for (DownloadInfoListener l : mDownloadInfoListeners) {
             l.onAdd(info, list, list.size() - 1);
         }
+    }
+
+    public void addDownload(GalleryInfo galleryInfo, @Nullable String label) {
+        addDownload(galleryInfo,label,DownloadInfo.STATE_NONE);
     }
 
     public void addDownloadInfo(GalleryInfo galleryInfo, @Nullable String label) {
@@ -1354,7 +1362,15 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
     private static final Comparator<DownloadInfo> DATE_DESC_COMPARATOR = new Comparator<>() {
         @Override
         public int compare(DownloadInfo lhs, DownloadInfo rhs) {
-            return lhs.time - rhs.time > 0 ? -1 : 1;
+            long dif = lhs.time - rhs.time;
+            if (dif > 0) {
+                return -1;
+            } else if (dif < 0) {
+                return 1;
+            } else {
+                return 0;
+            }
+//            return  > 0 ? -1 : 1;
         }
     };
 
