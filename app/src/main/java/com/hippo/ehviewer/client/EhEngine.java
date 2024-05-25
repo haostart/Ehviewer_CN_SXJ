@@ -16,7 +16,8 @@
 
 package com.hippo.ehviewer.client;
 
-import android.media.MediaCodec;
+import static com.hippo.ehviewer.client.data.ListUrlBuilder.MODE_NORMAL;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
@@ -253,7 +254,7 @@ public class EhEngine {
     }
 
     public static GalleryListParser.Result getGalleryList(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                                          String url) throws Throwable {
+                                                          String url,int mode) throws Throwable {
         String referer = EhUrl.getReferer();
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, referer).build();
@@ -274,7 +275,7 @@ public class EhEngine {
             headers = response.headers();
             assert response.body() != null;
             body = response.body().string();
-            result = GalleryListParser.parse(body);
+            result = GalleryListParser.parse(body,mode);
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
             throwException(call, code, headers, body, e);
@@ -535,6 +536,33 @@ public class EhEngine {
         }
     }
 
+    public static FavoritesParser.Result getAllFavorites(OkHttpClient okHttpClient, String url) throws Throwable {
+        String referer = EhUrl.getReferer();
+        Log.d(TAG, url);
+        Request request = new EhRequestBuilder(url, referer).build();
+        Call call = okHttpClient.newCall(request);
+
+        String body = null;
+        Headers headers = null;
+        FavoritesParser.Result result;
+        int code = -1;
+
+        try {
+            Response response = call.execute();
+            code = response.code();
+            headers = response.headers();
+            assert response.body() != null;
+            body = response.body().string();
+            result = FavoritesParser.parse(body);
+        } catch (Throwable e) {
+            ExceptionUtils.throwIfFatal(e);
+            throwException(call, code, headers, body, e);
+            throw e;
+        }
+
+        return result;
+    }
+
     public static FavoritesParser.Result getFavorites(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
                                                       String url, boolean callApi) throws Throwable {
         String referer = EhUrl.getReferer();
@@ -563,9 +591,7 @@ public class EhEngine {
             throwException(call, code, headers, body, e);
             throw e;
         }
-
         fillGalleryList(task, okHttpClient, result.galleryInfoList, url, false);
-
         return result;
     }
 
@@ -871,8 +897,8 @@ public class EhEngine {
 
         String origin = EhUrl.getOrigin();
         FormBody.Builder builder = new FormBody.Builder();
-        builder.add("dltype",dltype);
-        builder.add("dlcheck",dlcheck);
+        builder.add("dltype", dltype);
+        builder.add("dlcheck", dlcheck);
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, referer, origin)
                 .post(builder.build())
@@ -909,7 +935,7 @@ public class EhEngine {
             }
             body = responseC.body().string();
             String downloadPath = ArchiveParser.parseArchiverDownloadUrl(body);
-            String downloadUrl = "https://"+ responseC.request().url().host()+downloadPath;
+            String downloadUrl = "https://" + responseC.request().url().host() + downloadPath;
             return downloadUrl;
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
@@ -1022,37 +1048,39 @@ public class EhEngine {
      */
     public static GalleryListParser.Result imageSearch(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
                                                        File image, boolean uss, boolean osc, boolean se) throws Throwable {
+        String imageName = image.getName();
+        String fileName;
+        if (imageName.contains(".")) {
+            fileName = imageName;
+        } else {
+            fileName = imageName + ".jpg";
+        }
         MultipartBody.Builder builder = new MultipartBody.Builder();
         builder.setType(MultipartBody.FORM);
         builder.addPart(
-                Headers.of("Content-Disposition", "form-data; name=\"sfile\"; filename=\"a.jpg\""),
-//                RequestBody.create(image, MEDIA_TYPE_JPEG)
+                Headers.of("Content-Disposition", "form-data; name=\"sfile\"; filename=\"" + fileName + "\"; size=\"40\""),
                 RequestBody.create(MEDIA_TYPE_JPEG, image)
         );
         if (uss) {
             builder.addPart(
                     Headers.of("Content-Disposition", "form-data; name=\"fs_similar\""),
-//                    RequestBody.create("on", null)
                     RequestBody.create(null, "on")
             );
         }
         if (osc) {
             builder.addPart(
                     Headers.of("Content-Disposition", "form-data; name=\"fs_covers\""),
-//                    RequestBody.create("on", null)
                     RequestBody.create(null, "on")
             );
         }
         if (se) {
             builder.addPart(
                     Headers.of("Content-Disposition", "form-data; name=\"fs_exp\""),
-//                    RequestBody.create("on", null)
                     RequestBody.create(null, "on")
             );
         }
         builder.addPart(
                 Headers.of("Content-Disposition", "form-data; name=\"f_sfile\""),
-//                RequestBody.create("File Search", null)
                 RequestBody.create(null, "File Search")
         );
         String url = EhUrl.getImageSearchUrl();
@@ -1093,7 +1121,7 @@ public class EhEngine {
             headers = response.headers();
             assert response.body() != null;
             body = response.body().string();
-            result = GalleryListParser.parse(body);
+            result = GalleryListParser.parse(body, MODE_NORMAL);
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
             throwException(call, code, headers, body, e);
