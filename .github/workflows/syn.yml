@@ -1,0 +1,27 @@
+name: Sync Upstream  
+  
+on:  
+  schedule:  
+    # 每天的某个时间运行，例如每天的凌晨 1 点  
+    - cron: '0 1 * * *'  
+  
+jobs:  
+  sync:  
+    runs-on: ubuntu-latest  
+    steps:  
+      - name: Checkout your fork  
+        uses: actions/checkout@v2  
+        with:  
+          fetch-depth: 0 # 获取完整的提交历史，以便能够合并  
+  
+      - name: Set upstream remote  
+        run: |  
+          git remote add upstream https://github.com/xiaojieonly/Ehviewer_CN_SXJ.git  
+          git fetch upstream  
+  
+      - name: Merge upstream changes  
+        run: |  
+          git merge upstream/BiLi_PC_Gamer # 假设你想要合并到 master 分支，如果不是，请更改  
+        continue-on-error: false # 如果合并失败，Action 仍然会继续执行  
+  
+      # 你还可以添加通知步骤，如果合并成功或失败
