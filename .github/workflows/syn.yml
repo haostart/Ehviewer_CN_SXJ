@@ -18,7 +18,8 @@ jobs:
         run: |  
           git remote add upstream https://github.com/xiaojieonly/Ehviewer_CN_SXJ.git  
           git fetch upstream  
-  
+          git config --global user.email "haostart@hotmail.com"
+          git config --global user.name "haostart"
       - name: Merge upstream changes  
         run: |  
           git merge upstream/BiLi_PC_Gamer # 假设你想要合并到 master 分支，如果不是，请更改  
