@@ -79,6 +79,7 @@ import com.hippo.lib.glgallery.SimpleAdapter;
 import com.hippo.glview.view.GLRootView;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
+import com.hippo.util.HistoryUtils;
 import com.hippo.util.SystemUiHelper;
 import com.hippo.widget.ColorView;
 import com.hippo.yorozuya.AnimationUtils;
@@ -315,6 +316,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     @Override
     @SuppressWarnings({"WrongConstant"})
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+
         if (Settings.getReadingFullscreen()) {
             Window w = getWindow();
             w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
@@ -335,6 +337,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         onCreateView(savedInstanceState);
         //注册事件
         EventBus.getDefault().register(this);
+
     }
 
     private void onCreateView(@Nullable Bundle savedInstanceState) {

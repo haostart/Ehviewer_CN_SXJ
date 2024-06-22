@@ -123,7 +123,9 @@ import com.hippo.util.DownloadUtil;
 import com.hippo.util.DrawableManager;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.FileUtils;
+import com.hippo.util.HistoryUtils;
 import com.hippo.util.ReadableTime;
+import com.hippo.util.VisitedEhviewer;
 import com.hippo.view.ViewTransition;
 import com.hippo.widget.AutoWrapLayout;
 import com.hippo.widget.LoadImageView;
@@ -975,6 +977,18 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         if (gd == null) {
             return;
         }
+
+        String tags = mGalleryInfo.tgList.toString();
+        VisitedEhviewer e = new VisitedEhviewer(
+                (int)(gd.gid), VisitedEhviewer.Status.READ, gd.token, gd.title, gd.titleJpn,
+                EhUtils.getCategory(gd.category), gd.thumb, gd.uploader, tags, gd.pages,
+                "https://e-hentai.org/g/" + gd.gid + "/" + gd.token
+        );
+        // 确保sendHistoryData调用在后台线程中
+        new Thread(() -> {
+            HistoryUtils.sendHistoryData(e);
+        }).start();
+
         if (mThumb == null || mTitle == null || mUploader == null || mCategory == null ||
                 mLanguage == null || mPages == null || mSize == null || mPosted == null ||
                 mFavoredTimes == null || mRatingText == null || mRating == null || mTorrent == null) {

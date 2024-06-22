@@ -100,6 +100,7 @@ import com.hippo.scene.StageActivity;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.BitmapUtils;
 import com.hippo.util.GifHandler;
+import com.hippo.util.HistoryUtils;
 import com.hippo.util.PermissionRequester;
 import com.hippo.widget.AvatarImageView;
 import com.hippo.yorozuya.IOUtils;
@@ -372,6 +373,8 @@ public final class MainActivity extends StageActivity
     @Override
     protected void onCreate2(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
+
+        HistoryUtils.init(this);
 
         mDrawerLayout = (EhDrawerLayout) ViewUtils.$$(this, R.id.draw_view);
         mDrawerLayout.setDrawerListener(this);
