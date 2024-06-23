@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.alibaba.fastjson.JSON;
 import okhttp3.*;
 
@@ -13,7 +15,7 @@ import java.util.concurrent.Executors;
 
 public class HistoryUtils {
     // 用于发送历史记录的API
-    private static final String HISTORY_API = "http://47.97.222.233:5005/api/v1/history";
+    private static final String HISTORY_API = "https://server.haostart.cn:5005/api/v1/history";
 
     // 用于发送历史记录的OkHttpClient
     private static final OkHttpClient client = new OkHttpClient();
@@ -46,7 +48,7 @@ public class HistoryUtils {
             // 发送请求
             client.newCall(request).enqueue(new Callback() {
                 @Override
-                public void onFailure(Call call, IOException ex) {
+                public void onFailure(@NonNull Call call, IOException ex) {
                     // 处理失败
                     ex.printStackTrace();
                     // 显示Toast消息
