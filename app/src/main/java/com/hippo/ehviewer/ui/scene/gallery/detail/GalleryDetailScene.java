@@ -16,6 +16,8 @@
 
 package com.hippo.ehviewer.ui.scene.gallery.detail;
 
+import static com.hippo.util.HistoryUtils.showToast;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -32,6 +34,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -123,6 +126,8 @@ import com.hippo.util.DownloadUtil;
 import com.hippo.util.DrawableManager;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.FileUtils;
+import com.hippo.util.HistoryResponseCallback;
+import com.hippo.util.HistoryType;
 import com.hippo.util.HistoryUtils;
 import com.hippo.util.ReadableTime;
 import com.hippo.util.VisitedEhviewer;
@@ -977,17 +982,49 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         if (gd == null) {
             return;
         }
-
-        String tags = mGalleryInfo.tgList.toString();
-        VisitedEhviewer e = new VisitedEhviewer(
-                (int)(gd.gid), VisitedEhviewer.Status.READ, gd.token, gd.title, gd.titleJpn,
-                EhUtils.getCategory(gd.category), gd.thumb, gd.uploader, tags, gd.pages,
-                "https://e-hentai.org/g/" + gd.gid + "/" + gd.token
-        );
         // 确保sendHistoryData调用在后台线程中
-        new Thread(() -> {
-            HistoryUtils.sendHistoryData(e);
-        }).start();
+//        new Thread(() -> {
+//            HistoryUtils.sendHistoryData(e);
+//        }).start();
+        if (mContext == null) {
+            mContext = getEHContext();
+            if (mContext == null) {
+                return;
+            }
+        }
+        if (executorService == null) {
+            executorService = EhApplication.getExecutorService(mContext);
+        }
+
+        executorService.submit(() -> {
+            GalleryInfo gi = mGalleryInfo;
+            HistoryType type = HistoryType.READ;
+            VisitedEhviewer.Status status = VisitedEhviewer.Status.read;
+            if (gi.favoriteSlot >= 0) {
+                type = HistoryType.FAVORITE;
+                status = VisitedEhviewer.Status.favorite;
+            }
+            String tags = gi.tgList.toString();
+            VisitedEhviewer e = new VisitedEhviewer(
+                    (int) gi.gid, status, gi.token, gi.title, gi.titleJpn,
+                    EhUtils.getCategory(gi.category), gi.thumb, gi.uploader, tags, gi.pages,
+                    "https://e-hentai.org/g/" + gi.gid + "/" + gi.token
+            );
+            HistoryUtils.sendHistoryData(e, new HistoryResponseCallback() {
+                @Override
+                public void onSuccess(String status) {
+
+                }
+
+                @Override
+                public void onFailure(Exception ex) {
+                    // 处理失败
+                    ex.printStackTrace();
+//                    showToast("Failed to send history data: " + ex.getMessage());
+                }
+            },
+               type);
+        });
 
         if (mThumb == null || mTitle == null || mUploader == null || mCategory == null ||
                 mLanguage == null || mPages == null || mSize == null || mPosted == null ||

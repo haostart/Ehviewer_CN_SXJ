@@ -16,11 +16,15 @@
 
 package com.hippo.ehviewer.ui.scene.gallery.list;
 
+
+import static com.hippo.util.HistoryUtils.showToast;
+
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +50,10 @@ import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.ui.scene.TransitionNameFactory;
 import com.hippo.ehviewer.widget.SimpleRatingView;
 import com.hippo.ehviewer.widget.TileThumbNew;
+import com.hippo.util.HistoryResponseCallback;
+import com.hippo.util.HistoryType;
+import com.hippo.util.HistoryUtils;
+import com.hippo.util.VisitedEhviewer;
 import com.hippo.widget.LoadImageViewNew;
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager;
 import com.hippo.yorozuya.ViewUtils;
@@ -213,6 +221,51 @@ abstract class GalleryAdapterNew extends RecyclerView.Adapter<GalleryAdapterNew.
             return;
         }
 
+
+        // 确保sendHistoryData调用在后台线程中
+        executor.submit(()->{
+            String tags = gi.tgList.toString();
+            VisitedEhviewer e = new VisitedEhviewer(
+                    (int)(gi.gid), VisitedEhviewer.Status.unread, gi.token, gi.title, gi.titleJpn,
+                    EhUtils.getCategory(gi.category), gi.thumb, gi.uploader, tags, gi.pages,
+                    "https://e-hentai.org/g/" + gi.gid + "/" + gi.token
+            );
+            HistoryUtils.sendHistoryData(e, new HistoryResponseCallback() {
+                @Override
+                public void onSuccess(String status) {
+                    // 处理成功响应
+                    Log.d("HistoryUtils", "Received status: " + status);
+
+                    // 确保在主线程上更新 UI
+                    holder.read_status.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (status != null) {
+                                holder.read_status.setText(status);
+                                holder.read_status.setVisibility(View.VISIBLE);
+                            } else {
+                                holder.read_status.setText("获取状态失败");
+                                holder.read_status.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Exception ex) {
+                    // 处理失败
+                    ex.printStackTrace();
+                    holder.read_status.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            showToast("Failed to send history data: " + ex.getMessage());
+                        }
+                    });
+                }
+            },
+                    HistoryType.UPLOAD);
+
+        });
         switch (mType) {
             default:
             case TYPE_LIST: {
@@ -296,6 +349,8 @@ abstract class GalleryAdapterNew extends RecyclerView.Adapter<GalleryAdapterNew.
         public final TextView category;
         public final TextView posted;
         public final TextView pages;
+        public final TextView read_status;
+
         public final TextView simpleLanguage;
         public final ImageView favourite;
         public final ImageView downloaded;
@@ -309,6 +364,8 @@ abstract class GalleryAdapterNew extends RecyclerView.Adapter<GalleryAdapterNew.
             category = itemView.findViewById(R.id.category);
             posted = itemView.findViewById(R.id.posted);
             pages = itemView.findViewById(R.id.pages);
+
+            read_status = itemView.findViewById(R.id.read_status);
             simpleLanguage = itemView.findViewById(R.id.simple_language);
             favourite = itemView.findViewById(R.id.favourited);
             downloaded = itemView.findViewById(R.id.downloaded);

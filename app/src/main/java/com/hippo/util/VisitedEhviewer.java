@@ -3,7 +3,7 @@ package com.hippo.util;
 public class VisitedEhviewer {
 
     private Integer gid;
-    private Status status = Status.UNREAD;
+    private Status status;
     private String token;
     private String title;
     private String titleJpn;
@@ -121,8 +121,8 @@ public class VisitedEhviewer {
 
     // Enum for Status
     public enum Status {
-        UNREAD,
-        READ,
-        FAVORITE
+        unread,
+        read,
+        favorite
     }
 }

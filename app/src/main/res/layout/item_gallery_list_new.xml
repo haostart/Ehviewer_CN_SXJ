@@ -113,6 +113,14 @@
                 app:srcCompat="@drawable/v_heart_x16" />
 
             <TextView
+                android:id="@+id/read_status"
+                style="@style/CardMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/red_500"
+                android:text="未知" />
+
+            <TextView
                 android:id="@+id/simple_language"
                 style="@style/CardMessage"
                 android:layout_width="wrap_content"
