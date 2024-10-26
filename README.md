@@ -1,6 +1,116 @@
 # [感谢名单](https://github.com/xiaojieonly/Ehviewer_CN_SXJ/blob/BiLi_PC_Gamer/feedauthor/thankyou.md) 
 # [常见问题汇总](https://github.com/xiaojieonly/Ehviewer_CN_SXJ/blob/BiLi_PC_Gamer/feedauthor/EhviewerIssue.md)
 
+# 2024/10/01 : 紧急修复
+ ###  新版发布1.9.8.9（如果出现问题请覆盖安装旧版本）
+ ###  修复了一些可能导致崩溃的问题
+ ###  修复红米澎湃os里站出现空指针报错的问题
+ ###  紧急修复解析详情页的正则表达式
+
+
+[//]: # (   点击前往下载：[EhViewer &#40;20.8 MB&#41;]&#40;https://appteka.store/app/507r187173&#41;   )
+   点击前往下载：[Microsoft App Center](install.appcenter.ms/users/xiaojieonly/apps/com.xjs.ehviewer/distribution_groups/let's%20roll)   
+   点击前往下载：[百度云](https://pan.baidu.com/s/1XTqvHayna9J_vFGeMt2weg)  密码:8467   
+   点击前往下载（电脑端可正常下载）：[蓝奏云](https://wwsu.lanzouj.com/ijhHG2dc6cwd)  密码:b5a9   
+   点击前往下载：[github](https://github.com/xiaojieonly/Ehviewer_CN_SXJ/releases)    
+   点击前往赏饭：[要饭嘛不寒掺](https://github.com/xiaojieonly/Ehviewer_CN_SXJ/blob/BiLi_PC_Gamer/feedauthor/support.md)    
+   Torrent链接：magnet:?xt=urn:btih:f7f59ed53f0a0b9a8b3d174efaf1b9cfb43f7041&dn=EhViewer-1.9.8.9.apk   
+   Telegram群:https://t.me/+WyclP8pPlk-JfbwS    
+   Telegram通知群:https://t.me/Ehviewer_xiaojieonly_channel
+
+# 2024/10/01 : 祝大家国庆快乐
+ ###  新版发布1.9.8.7（如果出现问题请覆盖安装旧版本）
+ ###  修复WiFi迁移下载列表，在迁移后下载列表乱序的问题
+ ###  在云端收藏列表新增排序功能，可按收藏时间和上传时间进行排序
+ ###  档案压缩包下载位置从Download/EhviewerArchiver/改为Download/Ehviewer/Archiver/
+ ###  种子下载位置从Download/改为Download/Ehviewer/Torrent/；
+ ###  修复档案下载在通知栏没有正确显示的bug
+ ###  在下载档案时，在对应画廊添加了下载进度条
+ ###  修复部分画廊无法正确显示上传者评论的问题
+ ###  添加用户自签名网络证书许可
+ ###  修复图片连接获取出错的提示
+ ###  修复档案下载下载路径格式错误的bug
+ ###  修复可能导致无限重复下载的bug
+ ###  修复GP配额使用情况显示出错的问题
+ ###  修复在特定条件下图片缓存未生效的问题
+ ###  修隨機挑本的bug(真 (#1379)
+
+   点击前往下载：[EhViewer (20.8 MB)](https://appteka.store/app/507r187173)   
+   点击前往下载：[Microsoft App Center](install.appcenter.ms/users/xiaojieonly/apps/com.xjs.ehviewer/distribution_groups/let's%20roll)   
+   点击前往下载：[百度云](https://pan.baidu.com/s/15NRkRvgPrHT4rCUtVjhF3g)  密码:uvh6   
+   点击前往下载（电脑端可正常下载）：[蓝奏云](https://wwsu.lanzouj.com/irKpr2b6tl6b)  密码:7tix   
+   点击前往下载：[github](https://github.com/xiaojieonly/Ehviewer_CN_SXJ/releases)    
+   点击前往赏饭：[要饭嘛不寒掺](https://github.com/xiaojieonly/Ehviewer_CN_SXJ/blob/BiLi_PC_Gamer/feedauthor/support.md)    
+   Torrent链接：magnet:?xt=urn:btih:393a1babd42f18fdf04f8d0d4af80277c450c45c&dn=EhViewer-1.9.8.7.apk   
+   Telegram群:https://t.me/+WyclP8pPlk-JfbwS    
+   Telegram通知群:https://t.me/Ehviewer_xiaojieonly_channel
+
+# 2024/08/19 : E站略缩图服务器变更导致的强制更新，下次版本更新将顺延至10月
+ ###  新版发布1.9.8.6（如果出现问题请覆盖安装旧版本）
+ ###  修复下载计时器不适配多线程的问题
+ ###  修复导入搜索标签时，没有正常保留原有的插入时间导致标签无法正常排序的问题
+ ###  修复档案下载时，档案压缩包没有下载至公共的download目录的问题
+ ###  修复了一个添加下载项可能导致app崩溃的问题
+ ###  修复了一个下载档案文件时，获取下载链接失败导致app奔溃的问题
+ ###  修复隨機挑本的bug(#1363)
+ ###  优化添加搜索书签时的翻译逻辑
+ ###  修复表站列表因页面结构变动导致无法获取到画廊标签的问题
+ ###  更新host文件:删除了部分失效域名，修复略缩图host
+ ###  优化app link配置，现在每次安装都会重新检查一次
+
+   点击前往下载：[EhViewer (20.8 MB)](https://appteka.store/app/507r187173)   
+   点击前往下载：[Microsoft App Center](install.appcenter.ms/users/xiaojieonly/apps/com.xjs.ehviewer/distribution_groups/let's%20roll)   
+   点击前往下载：[百度云](https://pan.baidu.com/s/19uE6Q2JPqjsiMaoIyX_dCg)  密码:vonf   
+   点击前往下载（电脑端可正常下载）：[蓝奏云](https://wwsu.lanzouj.com/iLFVo27u9n2j)  密码:f5xs   
+   点击前往下载：[github](https://github.com/xiaojieonly/Ehviewer_CN_SXJ/releases)    
+   点击前往赏饭：[要饭嘛不寒掺](https://github.com/xiaojieonly/Ehviewer_CN_SXJ/blob/BiLi_PC_Gamer/feedauthor/support.md)    
+   Torrent链接：magnet:?xt=urn:btih:df119c759394a0231afdc3a2c7c606742501cd61&dn=EhViewer-1.9.8.6.apk   
+   Telegram群:https://t.me/+WyclP8pPlk-JfbwS    
+   Telegram通知群:https://t.me/Ehviewer_xiaojieonly_channel
+
+# 2024/08/01 :
+ ###  新版发布1.9.8.5（如果出现问题请覆盖安装旧版本）
+ ###  更新host文件
+ ###  新增host地址随机调用
+ ###  出于下载稳定性考虑，对于存在新版的画廊，不再提供覆盖下载，为了避免下载按钮的逻辑混乱，在有新版本的画廊中，提供了一个新的按钮供用户前往新版本
+ ###  修复只用音量键翻页时，页面会在翻过随机数量的页面后重新回到初始页面的问题
+ ###  删除历史记录上限选择列表中的无用选项
+ ###  修复了档案下载完成后下载标签列表对应档案分组总数没有加1的问题
+ ###  修复了普通下载任务创建后下载标签列表对应分组总数没有加1的问题
+ ###  优化下载列表悬浮按钮位置以防止遮挡开始下载按钮
+ ###  修复下载列表随机浏览可能会导致app奔溃的问题
+ ###  下载超时计数器从CountDownTimer变更为Timer，以避免内存泄漏风险
+   点击前往下载：[EhViewer (20.8 MB)](https://appteka.store/app/87ar184853)   
+   点击前往下载：[Microsoft App Center](install.appcenter.ms/users/xiaojieonly/apps/com.xjs.ehviewer/distribution_groups/let's%20roll)   
+   点击前往下载：[百度云](https://pan.baidu.com/s/10QXSnVi9wFJJ8VJC66-B1w)  密码:bc1w   
+   点击前往下载（电脑端可正常下载）：[蓝奏云](https://wwi.lanzouj.com/ipD4h266eqch)  密码:hq0c   
+   点击前往下载：[github](https://github.com/xiaojieonly/Ehviewer_CN_SXJ/releases)    
+   点击前往赏饭：[要饭嘛不寒掺](https://github.com/xiaojieonly/Ehviewer_CN_SXJ/blob/BiLi_PC_Gamer/feedauthor/support.md)    
+   Torrent链接：magnet:?xt=urn:btih:a7c51cab0345012f1818dd2c7c588687f440124c&dn=EhViewer-1.9.8.4.apk   
+   Telegram群:https://t.me/+WyclP8pPlk-JfbwS    
+   Telegram通知群:https://t.me/Ehviewer_xiaojieonly_channel 
+
+# 2024/07/01 :     
+ ###  新版发布1.9.8.4（如果出现问题请覆盖安装旧版本）   
+ ###  修复历史记录需要重新设置才能显示的问题   
+ ###  新增图片请求链接校验，以防止在h@h服务器被不法分子劫持后导致的涉政、涉毒、涉赌及邪教等极端或影响E站及APP稳定性的内容的出现   
+ ###  下载列表添加随机浏览功能   
+ ###  改善收藏按鈕   
+ ###  新增图片搜索上传地址host   
+ ###  图片搜索优化   
+ ###  历史记录默认值从0修改为100,去除无上限选项，为了流畅度考虑，现在的历史记录上限为20000   
+ ###  新增下载超时时间设置，用于设置每张图片的最大下载时限，默认不设限，可在'设置-下载'内进行设置   
+ ###  新增下载速度归零超时放弃功能，现在下载速度为0超过30秒会主动放弃当前下载的图片   
+ ###  浏览画廊图片时，为阅读进度文本添加黑色描边   
+   点击前往下载：[Microsoft App Center](install.appcenter.ms/users/xiaojieonly/apps/com.xjs.ehviewer/distribution_groups/let's%20roll)   
+   点击前往下载：[EhViewer (20.8 MB)](https://appteka.store/app/4c5r180827)   
+   点击前往下载：[百度云](https://pan.baidu.com/s/1FVBOwj7FrJ2n42wa9YkV-Q)  密码:cah3   
+   点击前往下载（电脑端可正常下载）：[蓝奏云](https://wwb.lanzouj.com/iIA9u238xp0h)  密码:g7vx   
+   点击前往下载：[github](https://github.com/xiaojieonly/Ehviewer_CN_SXJ/releases)    
+   点击前往赏饭：[要饭嘛不寒掺](https://github.com/xiaojieonly/Ehviewer_CN_SXJ/blob/BiLi_PC_Gamer/feedauthor/support.md)    
+   Torrent链接：magnet:?xt=urn:btih:a7c51cab0345012f1818dd2c7c588687f440124c&dn=EhViewer-1.9.8.4.apk   
+   Telegram群:https://t.me/+WyclP8pPlk-JfbwS    
+   Telegram通知群:https://t.me/Ehviewer_xiaojieonly_channel    
 
 # 2024/06/01 :  祝大家儿童节快乐~~~
  ###  新版发布1.9.8.1（如果出现问题请覆盖安装旧版本）   
@@ -181,11 +291,29 @@ The apk is in app\build\outputs\apk
 
 # Thanks
 
+感谢Ehviewer奠基人[Hippo/seven332](https://github.com/seven332)    
+Thanks to [Hippo/seven332](https://github.com/seven332), the founder of Ehviewer    
+
 本项目受到了诸多开源项目的帮助  
-感谢Ehviewer奠基人[Hippo/seven332](https://github.com/seven332)
+This project has received help from many open source projects  
 
+这是部分库
 Here is the libraries  
-Thanks to [Hippo/seven332](https://github.com/seven332), the founder of Ehviewer
-
 - [AOSP](http://source.android.com/)
-- [android-advancedrecyclerview](https://github.com/h6a
+- [android-advancedrecyclerview](https://github.com/h6ah4i/android-advancedrecyclerview)
+- [Apache Commons Lang](https://commons.apache.org/proper/commons-lang/)
+- [apng](http://apng.sourceforge.net/)
+- [giflib](http://giflib.sourceforge.net)
+- [greenDAO](https://github.com/greenrobot/greenDAO)
+- [jsoup](https://github.com/jhy/jsoup)
+- [libjpeg-turbo](http://libjpeg-turbo.virtualgl.org/)
+- [libpng](http://www.libpng.org/pub/png/libpng.html)
+- [okhttp](https://github.com/square/okhttp)
+- [roaster](https://github.com/forge/roaster)
+- [ShowcaseView](https://github.com/amlcurran/ShowcaseView)
+- [Slabo](https://github.com/TiroTypeworks/Slabo)
+- [TagSoup](http://home.ccil.org/~cowan/tagsoup/)
+
+## 状态
+
+[![Alt](https://repobeats.axiom.co/api/embed/e6becb5b041dae430dff7f85581aa1f91975d416.svg "Repobeats analytics image")](https://github.com/xiaojieonly/Ehviewer_CN_SXJ/pulse)

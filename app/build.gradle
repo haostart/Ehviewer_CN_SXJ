@@ -10,7 +10,7 @@ if (file('google-services.json').exists()) {
 android {
     namespace 'com.hippo.ehviewer'
     testNamespace 'com.hippo.ehviewer.debug'
-    compileSdkVersion 32
+    compileSdkVersion 31
 //    buildToolsVersion "30.0.3"
 //    ndkVersion '23.1.7779620'
 
@@ -30,10 +30,11 @@ android {
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 29
         versionCode 111
-        versionName "1.9.8.1"
+        versionName "1.9.8.9"
         vectorDrawables.useSupportLibrary = true
         resConfigs 'zh', 'zh-rCN', 'zh-rHK', 'zh-rTW', 'es', 'ja', 'ko', 'fr', 'de', 'th'
         testOptions.unitTests.includeAndroidResources = true
+        multiDexEnabled true
         ndk {
             moduleName "native-lib"
             abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
@@ -141,6 +142,8 @@ dependencies {
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
     implementation 'com.alibaba:fastjson:1.2.83'
 //    implementation 'com.alibaba.fastjson2:fastjson2:2.0.47'
+
+    implementation 'com.android.support:multidex:1.0.3'
 
     /**
      * 原始依赖

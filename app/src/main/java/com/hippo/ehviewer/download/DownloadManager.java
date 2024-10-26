@@ -549,7 +549,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
         }
     }
 
-    public void addDownload(GalleryInfo galleryInfo, @Nullable String label,int state) {
+    public void addDownload(GalleryInfo galleryInfo, @Nullable String label, int state) {
         if (containDownloadInfo(galleryInfo.gid)) {
             // Contain
             return;
@@ -563,6 +563,12 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
 
         // Add to label download list
         LinkedList<DownloadInfo> list = getInfoListForLabel(info.label);
+        if (!mLabelCountMap.containsKey(label)) {
+            mLabelCountMap.put(label, 1L);
+        } else {
+            long value = mLabelCountMap.get(label) + 1L;
+            mLabelCountMap.put(label, value);
+        }
         if (list == null) {
             Log.e(TAG, "Can't find download info list with label: " + label);
             return;
@@ -583,7 +589,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
     }
 
     public void addDownload(GalleryInfo galleryInfo, @Nullable String label) {
-        addDownload(galleryInfo,label,DownloadInfo.STATE_NONE);
+        addDownload(galleryInfo, label, DownloadInfo.STATE_NONE);
     }
 
     public void addDownloadInfo(GalleryInfo galleryInfo, @Nullable String label) {
@@ -596,7 +602,9 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
         DownloadInfo info = new DownloadInfo(galleryInfo);
         info.label = label;
         info.state = DownloadInfo.STATE_NONE;
-        info.time = System.currentTimeMillis();
+        if (info.time == 0) {
+            info.time = System.currentTimeMillis();
+        }
 
         // Add to label download list
         LinkedList<DownloadInfo> list = getInfoListForLabel(info.label);

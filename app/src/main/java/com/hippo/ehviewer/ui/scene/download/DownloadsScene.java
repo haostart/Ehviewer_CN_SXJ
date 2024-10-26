@@ -18,9 +18,7 @@ package com.hippo.ehviewer.ui.scene.download;
 
 import static com.hippo.ehviewer.spider.SpiderDen.getGalleryDownloadDir;
 import static com.hippo.ehviewer.spider.SpiderInfo.getSpiderInfo;
-import static com.hippo.ehviewer.ui.scene.gallery.detail.GalleryDetailScene.KEY_COME_FROM_DOWNLOAD;
 
-import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -949,17 +947,18 @@ public class DownloadsScene extends ToolbarScene
                         return;
                     }
                     onClickPrimaryFab(mFabLayout,null);
-                    viewRandom((int) (Math.random() * mList.size()));
+                    viewRandom();
                     break;
             }
         }
     }
 
-    private void viewRandom(int position) {
+    private void viewRandom() {
         List<DownloadInfo> list = mList;
         if (list == null) {
             return;
         }
+        int position = (int) (Math.random() * list.size());
         if (position < 0 || position >= list.size()) {
             return ;
         }
@@ -970,8 +969,7 @@ public class DownloadsScene extends ToolbarScene
 
         Intent intent = new Intent(activity, GalleryActivity.class);
         intent.setAction(GalleryActivity.ACTION_EH);
-        intent.putExtra(GalleryActivity.KEY_GALLERY_INFO, list.get(positionInList(position)));
-//            startActivity(intent);
+        intent.putExtra(GalleryActivity.KEY_GALLERY_INFO, list.get(position));
         galleryActivityLauncher.launch(intent);
     }
 
@@ -982,6 +980,9 @@ public class DownloadsScene extends ToolbarScene
         }
         if (mAdapter != null) {
             mAdapter.notifyItemInserted(position);
+        }
+        if (downloadLabelDraw!=null){
+            downloadLabelDraw.updateDownloadLabels();
         }
         updateView();
     }
@@ -1083,7 +1084,6 @@ public class DownloadsScene extends ToolbarScene
                 bindState(holder, info, resources.getString(R.string.download_state_none));
                 break;
             case DownloadInfo.STATE_WAIT:
-            case DownloadInfo.STATE_UPDATE:
                 bindState(holder, info, resources.getString(R.string.download_state_wait));
                 break;
             case DownloadInfo.STATE_DOWNLOAD:
@@ -1588,7 +1588,6 @@ public class DownloadsScene extends ToolbarScene
                 Bundle args = new Bundle();
                 args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_DOWNLOAD_GALLERY_INFO);
                 args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, list.get(positionInList(index)));
-                args.putBoolean(KEY_COME_FROM_DOWNLOAD, true);
                 Announcer announcer = new Announcer(GalleryDetailScene.class).setArgs(args);
                 announcer.setTranHelper(new EnterGalleryDetailTransaction(thumb));
                 startScene(announcer);

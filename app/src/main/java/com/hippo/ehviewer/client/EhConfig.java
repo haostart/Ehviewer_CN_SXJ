@@ -220,7 +220,10 @@ public class EhConfig implements Cloneable {
     public static final String IMAGE_SIZE_780X = "780";
     /**
      * Image Size 980x
+     * 2024-09-11
+     * - The 980x resample option has been retired due to a combination of performance/overhead issues and lack of use.
      */
+    @Deprecated
     public static final String IMAGE_SIZE_980X = "980";
     /**
      * Image Size 1280x
@@ -526,6 +529,15 @@ public class EhConfig implements Cloneable {
      * not show warning
      */
     public static final String CONTENT_WARNING_NOT_SHOW = "1";
+
+    public static final String ARCHIVER_PATH = "Ehviewer/Archiver/";
+    public static final String TORRENT_PATH = "Ehviewer/Torrent/";
+
+    /**
+     * favorites list sort by Favorited Time or Published Time
+     */
+    public static final String ORDER_BY_FAV_TIME = "f";
+    public static final String ORDER_BY_PUB_TIME = "p";
 
     /**
      * Load images through the Hentai@Home Network<br/>
