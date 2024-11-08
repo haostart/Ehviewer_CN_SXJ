@@ -16,6 +16,10 @@
 
 package com.hippo.widget;
 
+import static android.graphics.Bitmap.Config.HARDWARE;
+import static com.hippo.ehviewer.client.EhUrl.DOMAIN_E;
+import static com.hippo.ehviewer.client.EhUrl.DOMAIN_EX;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -28,6 +32,8 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.drawable.Animatable;
+import android.graphics.drawable.AnimatedImageDrawable;
+import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -44,14 +50,11 @@ import androidx.annotation.Nullable;
 
 import com.hippo.conaco.Conaco;
 import com.hippo.conaco.ConacoTask;
-import com.hippo.conaco.DataContainer;
 import com.hippo.conaco.Unikery;
 import com.hippo.drawable.PreciselyClipDrawable;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
-import com.hippo.image.ImageBitmap;
-import com.hippo.image.ImageDrawable;
-import com.hippo.image.RecycledException;
+import com.hippo.lib.image.ImageBitmap;
 import com.hippo.util.DrawableManager;
 
 import java.lang.annotation.Retention;
@@ -68,7 +71,6 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
     private Conaco<ImageBitmap> mConaco;
     private String mKey;
     private String mUrl;
-    private DataContainer mContainer;
     private boolean mUseNetwork;
     private int mOffsetX = Integer.MIN_VALUE;
     private int mOffsetY = Integer.MIN_VALUE;
@@ -84,6 +86,7 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
      */
     private float mRadius;
     private boolean mIsCircle;
+    private ImageBitmap imageBitmap;
 
     public AvatarImageView(Context context) {
         super(context);
@@ -107,7 +110,7 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
         mRadius = a.getDimension(R.styleable.LoadImageView_image_radius, 0);
         mIsCircle = a.getBoolean(R.styleable.LoadImageView_image_circle, false);
 
-        if (attrs != null ){
+        if (attrs != null) {
             int srcResource = attrs.getAttributeResourceValue(
                     "http://schemas.android.com/apk/res/android", "src", 0);
             if (srcResource != 0)
@@ -134,7 +137,7 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
         int width = getWidth() - getPaddingLeft() - getPaddingRight();
         int height = getHeight() - getPaddingTop() - getPaddingBottom();
         Bitmap image = drawableToBitmap(getDrawable());
-        if (image == null){
+        if (image == null) {
             super.onDraw(canvas);
             return;
         }
@@ -168,9 +171,9 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
         if (!mLoadFromDrawable) {
             if (mFailed) {
                 onFailure();
-            /* if (!mConaco.isLoading(mTaskId)) TODO Update Conaco */
+                /* if (!mConaco.isLoading(mTaskId)) TODO Update Conaco */
             } else if (mTaskId == Unikery.INVALID_ID) {
-                load(mKey, mUrl, mContainer, mUseNetwork);
+                load(mKey, mUrl, mUseNetwork);
             }
         }
     }
@@ -191,7 +194,7 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
         }
     }
 
-    private ImageDrawable getImageDrawable() {
+    private Drawable getImageDrawable() {
         Drawable drawable = getDrawable();
         if (drawable instanceof TransitionDrawable) {
             TransitionDrawable transitionDrawable = (TransitionDrawable) drawable;
@@ -200,24 +203,19 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
             }
         }
         if (drawable instanceof PreciselyClipDrawable) {
-            drawable = ((PreciselyClipDrawable) drawable).getWrappedDrawable();
+            drawable = ((PreciselyClipDrawable) drawable).getDrawable();
         }
-        if (drawable instanceof ImageDrawable) {
-            return (ImageDrawable) drawable;
-        } else {
-            return null;
-        }
+        return drawable;
     }
 
     private void clearDrawable() {
-        // Recycle ImageDrawable
-        ImageDrawable imageDrawable = getImageDrawable();
-        if (imageDrawable != null) {
-            imageDrawable.recycle();
-        }
-
         // Set drawable null
         setImageDrawable(null);
+        // Recycle ImageDrawable
+        if (imageBitmap != null) {
+            imageBitmap.release();
+            imageBitmap = null;
+        }
     }
 
     private void clearRetry() {
@@ -268,15 +266,11 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
     }
 
     public void load(String key, String url) {
-        load(key, url, null, true);
+        load(key, url, true);
     }
 
     public void load(String key, String url, boolean useNetwork) {
-        load(key, url, null, useNetwork);
-    }
-
-    public void load(String key, String url, DataContainer container, boolean useNetwork) {
-        if (url == null || (key == null && container == null)) {
+        if (url == null || key == null) {
             return;
         }
 
@@ -286,22 +280,13 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
 
         mKey = key;
         mUrl = url;
-        mContainer = container;
         mUseNetwork = useNetwork;
 
         ConacoTask.Builder<ImageBitmap> builder = new ConacoTask.Builder<ImageBitmap>()
                 .setUnikery(this)
                 .setKey(key)
                 .setUrl(url)
-                .setDataContainer(container)
                 .setUseNetwork(useNetwork);
-//        ConacoTask.Builder<ImageBitmap> builder = new ConacoTask.Builder<>();
-//        builder.unikery = this;
-//        builder.key = key;
-//        builder.url = url;
-//        builder.dataContainer= container;
-//        builder.useNetwork= useNetwork;
-//        builder.okHttpClient= EhApplication.getImageOkHttpClient(getContext());
         mConaco.load(builder);
     }
 
@@ -323,7 +308,6 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
         mConaco.cancel(this);
         mKey = null;
         mUrl = null;
-        mContainer = null;
         clearDrawable();
     }
 
@@ -351,8 +335,8 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
     public boolean onGetValue(@NonNull ImageBitmap value, int source) {
         Drawable drawable;
         try {
-            drawable = new ImageDrawable(value);
-        } catch (RecycledException e) {
+            drawable = value.getDrawable();
+        } catch (Exception e) {
             // The image might be recycled because it is removed from memory cache.
             Log.d(TAG, "The image is recycled", e);
             return false;
@@ -384,11 +368,7 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
         mFailed = true;
         clearDrawable();
         Drawable drawable;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            drawable = DrawableManager.getVectorDrawable(getContext(), R.drawable.image_failed_new);
-        } else {
-            drawable = DrawableManager.getVectorDrawable(getContext(), R.drawable.image_failed);
-        }
+        drawable = DrawableManager.getVectorDrawable(getContext(), R.drawable.image_failed_new);
 
         onPreSetImageDrawable(drawable, true);
         setImageDrawable(drawable);
@@ -400,7 +380,6 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
             // Can't retry, so release
             mKey = null;
             mUrl = null;
-            mContainer = null;
         }
     }
 
@@ -411,38 +390,59 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
 
     @Override
     public void start() {
-        ImageDrawable drawable = getImageDrawable();
-        if (drawable != null) {
-            drawable.start();
+        Drawable drawable = getImageDrawable();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            if (drawable instanceof AnimatedImageDrawable animatedImageDrawable) {
+                animatedImageDrawable.start();
+            }
+        }else {
+            if (drawable instanceof AnimationDrawable animatedImageDrawable) {
+                animatedImageDrawable.start();
+            }
         }
+
     }
 
     @Override
     public void stop() {
-        ImageDrawable drawable = getImageDrawable();
-        if (drawable != null) {
-            drawable.stop();
+        Drawable drawable = getImageDrawable();
+        if (Build.VERSION.SDK_INT>Build.VERSION_CODES.P){
+            if (drawable instanceof AnimatedImageDrawable animatedImageDrawable) {
+                animatedImageDrawable.stop();
+            }
+        }else {
+            if (drawable instanceof AnimationDrawable animatedImageDrawable) {
+                animatedImageDrawable.stop();
+            }
         }
     }
 
     @Override
     public boolean isRunning() {
-        ImageDrawable drawable = getImageDrawable();
-        if (drawable != null) {
-            return drawable.isRunning();
-        } else {
-            return false;
+        Drawable drawable = getImageDrawable();
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.P){
+            if (drawable instanceof AnimatedImageDrawable animatedImageDrawable) {
+                return animatedImageDrawable.isRunning();
+            } else {
+                return false;
+            }
+        }else {
+            if (drawable instanceof AnimationDrawable animatedImageDrawable) {
+                return animatedImageDrawable.isRunning();
+            } else {
+                return false;
+            }
         }
     }
 
     @Override
     public void onClick(@NonNull View v) {
-        load(mKey, mUrl, mContainer, true);
+        load(mKey, mUrl, true);
     }
 
     @Override
     public boolean onLongClick(@NonNull View v) {
-        load(mKey, mUrl, mContainer, true);
+        load(mKey, mUrl, true);
         return true;
     }
 
@@ -496,7 +496,23 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
                 paint);
         // 核心代码取两个图片的交集部分
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(source, (width - source.getWidth()) >> 1,
+        Bitmap src;
+        if (Build.VERSION.SDK_INT>Build.VERSION_CODES.P){
+            if (source.getConfig() == HARDWARE) {
+                src = source.copy(Bitmap.Config.ARGB_8888, false);
+            } else {
+                src = source;
+            }
+        }else {
+            if (source.getConfig()== Bitmap.Config.ARGB_8888){
+                src = source;
+            }else {
+                src = source.copy(Bitmap.Config.ARGB_8888, false);
+            }
+        }
+
+
+        canvas.drawBitmap(src, (width - source.getWidth()) >> 1,
                 (height - source.getHeight()) >> 1, paint);
         return target;
 
@@ -568,7 +584,11 @@ public class AvatarImageView extends FixedAspectImageView implements Unikery<Ima
         int x = (newWidth - width) / 2;
         int y = (newHeight - height) / 2;
         if (x > 0 && y > 0) {
-            return Bitmap.createBitmap(bitmap, 0, 0, width, height, null, true);
+//            float scaleWidth = (float) newWidth /width;
+//            float scaleHeight = (float) newHeight /height;
+//            Matrix matrix = new Matrix();
+//            matrix.postScale(scaleWidth, scaleHeight);
+            return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
         }
 
         float scale;

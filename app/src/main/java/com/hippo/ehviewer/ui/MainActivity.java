@@ -48,7 +48,6 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.navigation.NavigationView;
@@ -103,10 +102,10 @@ import com.hippo.util.GifHandler;
 import com.hippo.util.HistoryUtils;
 import com.hippo.util.PermissionRequester;
 import com.hippo.widget.AvatarImageView;
-import com.hippo.yorozuya.IOUtils;
-import com.hippo.yorozuya.ResourcesUtils;
-import com.hippo.yorozuya.SimpleHandler;
-import com.hippo.yorozuya.ViewUtils;
+import com.hippo.lib.yorozuya.IOUtils;
+import com.hippo.lib.yorozuya.ResourcesUtils;
+import com.hippo.lib.yorozuya.SimpleHandler;
+import com.hippo.lib.yorozuya.ViewUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -552,7 +551,7 @@ public final class MainActivity extends StageActivity
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
+//        super.onSaveInstanceState(outState, outPersistentState);
         outState.putInt(KEY_NAV_CHECKED_ITEM, mNavCheckedItem);
     }
 
