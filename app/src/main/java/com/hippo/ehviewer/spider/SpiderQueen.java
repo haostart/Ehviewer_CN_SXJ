@@ -1372,6 +1372,9 @@ public final class SpiderQueen implements Runnable {
                     MediaType mediaType = responseBody.contentType();
                     if (mediaType != null) {
                         extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mediaType.toString());
+                        if (extension != null&&!extension.contains(".")){
+                            extension= "."+extension;
+                        }
                     }
                     // Ensure extension
                     if (!Utilities.contain(GalleryProvider2.SUPPORT_IMAGE_EXTENSIONS, extension)) {
@@ -1793,7 +1796,9 @@ public final class SpiderQueen implements Runnable {
                 if (is != null) {
                     try {
                         image = Image.decode((FileInputStream) is, false);
-                    } finally {
+                    }catch (OutOfMemoryError e){
+                        FirebaseCrashlytics.getInstance().recordException(e);
+                    }finally {
                         try {
                             is.close();
                         } catch (IOException e) {

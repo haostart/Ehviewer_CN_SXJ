@@ -17,9 +17,9 @@
  */
 package com.hippo.lib.image
 
-import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.ImageDecoder
 import android.graphics.ImageDecoder.ALLOCATOR_DEFAULT
@@ -38,7 +38,6 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.hippo.ehviewer.EhApplication
 import java.io.FileInputStream
 import java.nio.channels.FileChannel
-import kotlin.Exception
 import kotlin.math.min
 
 class Image private constructor(
@@ -53,6 +52,10 @@ class Image private constructor(
     init {
         mObtainedDrawable = null
         source?.let {
+            var simpleSize: Int? = null
+            if (source.available() > 8388608) {
+                simpleSize = source.available() / 8388608
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 val src = ImageDecoder.createSource(
                     source.channel.map(
@@ -69,10 +72,11 @@ class Image private constructor(
                             // Idk it will cause how much performance regression
 
                             decoder.setTargetSampleSize(
-                                min(
-                                    info.size.width / (2 * screenWidth),
-                                    info.size.height / (2 * screenHeight)
-                                ).coerceAtLeast(1)
+                                simpleSize
+                                    ?: min(
+                                        info.size.width / (2 * screenWidth),
+                                        info.size.height / (2 * screenHeight)
+                                    ).coerceAtLeast(1)
                             )
                             // Don't
                         }
@@ -81,11 +85,20 @@ class Image private constructor(
                 }
                 // Should we lazy decode it?
             } else {
-                mObtainedDrawable=Drawable.createFromStream(source,null)
+                if (simpleSize != null) {
+                    val option = BitmapFactory.Options().apply {
+                        inSampleSize = simpleSize
+                    }
+                    val bitmap = BitmapFactory.decodeStream(source, null, option)
+                    mObtainedDrawable =
+                        BitmapDrawable(EhApplication.getInstance().resources, bitmap)
+                } else {
+                    mObtainedDrawable = BitmapDrawable.createFromStream(source, null)
+                }
             }
         }
         if (mObtainedDrawable == null) {
-            mObtainedDrawable = drawable
+            mObtainedDrawable = drawable!!
 //            throw IllegalArgumentException("数据解码出错")
         }
     }
@@ -95,8 +108,10 @@ class Image private constructor(
     } else {
         mObtainedDrawable is AnimationDrawable
     }
-    val width = mObtainedDrawable!!.intrinsicWidth
-    val height = mObtainedDrawable!!.intrinsicHeight
+    val width =
+        (mObtainedDrawable as? BitmapDrawable)?.bitmap?.width ?: mObtainedDrawable!!.intrinsicWidth
+    val height = (mObtainedDrawable as? BitmapDrawable)?.bitmap?.height
+        ?: mObtainedDrawable!!.intrinsicHeight
     val isRecycled = mObtainedDrawable == null
 
     var started = false
@@ -129,28 +144,28 @@ class Image private constructor(
         mObtainedDrawable!!.draw(Canvas(mBitmap!!))
     }
 
-    fun render(
-        srcX: Int, srcY: Int, dst: Bitmap, dstX: Int, dstY: Int,
-        width: Int, height: Int
-    ) {
-        check(!hardware) { "Hardware buffer cannot be used in glgallery" }
-        val bitmap: Bitmap = if (animated) {
-            updateBitmap()
-            mBitmap!!
-        } else {
-            (mObtainedDrawable as BitmapDrawable).bitmap
-        }
-        nativeRender(
-            bitmap,
-            srcX,
-            srcY,
-            dst,
-            dstX,
-            dstY,
-            width,
-            height
-        )
-    }
+//    fun render(
+//        srcX: Int, srcY: Int, dst: Bitmap, dstX: Int, dstY: Int,
+//        width: Int, height: Int
+//    ) {
+//        check(!hardware) { "Hardware buffer cannot be used in glgallery" }
+//        val bitmap: Bitmap = if (animated) {
+//            updateBitmap()
+//            mBitmap!!
+//        } else {
+//            (mObtainedDrawable as BitmapDrawable).bitmap
+//        }
+//        nativeRender(
+//            bitmap,
+//            srcX,
+//            srcY,
+//            dst,
+//            dstX,
+//            dstY,
+//            width,
+//            height
+//        )
+//    }
 
     fun texImage(init: Boolean, offsetX: Int, offsetY: Int, width: Int, height: Int) {
         check(!hardware) { "Hardware buffer cannot be used in glgallery" }
@@ -204,6 +219,17 @@ class Image private constructor(
         fun decode(stream: FileInputStream, hardware: Boolean = true): Image? {
             try {
                 return Image(stream, hardware = hardware)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                FirebaseCrashlytics.getInstance().recordException(e)
+                return null
+            }
+        }
+
+        @JvmStatic
+        fun decode(drawable: Drawable?, hardware: Boolean = true): Image? {
+            try {
+                return Image(null, drawable, hardware = hardware)
             } catch (e: Exception) {
                 e.printStackTrace()
                 FirebaseCrashlytics.getInstance().recordException(e)
