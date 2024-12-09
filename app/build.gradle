@@ -30,7 +30,7 @@ android {
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 29
         versionCode 111
-        versionName "1.9.9.4"
+        versionName "1.9.9.6"
         vectorDrawables.useSupportLibrary = true
         resConfigs 'zh', 'zh-rCN', 'zh-rHK', 'zh-rTW', 'es', 'ja', 'ko', 'fr', 'de', 'th'
         testOptions.unitTests.includeAndroidResources = true
@@ -172,7 +172,7 @@ dependencies {
     implementation 'com.github.seven332:refreshlayout:0.1.0'
     implementation 'com.github.seven332:ripple:0.1.2'
     implementation 'com.github.seven332:streampipe:0.1.0'
-    implementation 'com.github.seven332:tuxiang:0.1.6'
+//    implementation 'com.github.seven332:tuxiang:0.1.6'
 //    implementation 'com.github.seven332:unifile:9ec57bcd8f'
 //    implementation 'com.github.seven332:yorozuya:0.1.2'
 //    implementation 'com.github.seven332:yorozuya-thread:0.1.1'

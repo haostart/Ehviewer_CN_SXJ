@@ -38,6 +38,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.hippo.ehviewer.EhApplication
 import java.io.FileInputStream
 import java.nio.channels.FileChannel
+import kotlin.math.max
 import kotlin.math.min
 
 class Image private constructor(
@@ -46,15 +47,16 @@ class Image private constructor(
     val hardware: Boolean = false,
     val release: () -> Unit? = {}
 ) {
-    internal var mObtainedDrawable: Drawable?
+    private var mObtainedDrawable: Drawable?
     private var mBitmap: Bitmap? = null
+    private var mReferences = 0
 
     init {
         mObtainedDrawable = null
         source?.let {
             var simpleSize: Int? = null
-            if (source.available() > 8388608) {
-                simpleSize = source.available() / 8388608
+            if (source.available() > 10485760) {
+                simpleSize = source.available() / 10485760 + 1
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 val src = ImageDecoder.createSource(
@@ -70,13 +72,12 @@ class Image private constructor(
                                 if (hardware) ALLOCATOR_DEFAULT else ALLOCATOR_SOFTWARE
                             // Sadly we must use software memory since we need copy it to tile buffer, fuck glgallery
                             // Idk it will cause how much performance regression
-
+                            val screenSize = min(
+                                info.size.width / (2 * screenWidth),
+                                info.size.height / (2 * screenHeight)
+                            ).coerceAtLeast(1)
                             decoder.setTargetSampleSize(
-                                simpleSize
-                                    ?: min(
-                                        info.size.width / (2 * screenWidth),
-                                        info.size.height / (2 * screenHeight)
-                                    ).coerceAtLeast(1)
+                                max(screenSize, simpleSize ?: 1)
                             )
                             // Don't
                         }
@@ -144,6 +145,29 @@ class Image private constructor(
         mObtainedDrawable!!.draw(Canvas(mBitmap!!))
     }
 
+    @Synchronized
+    fun obtain(): Boolean {
+        return if (isRecycled) {
+            false
+        } else {
+            ++mReferences
+            true
+        }
+    }
+
+    @Synchronized
+    fun release() {
+        --mReferences
+        if (mReferences <= 0 && isRecycled) {
+            recycle()
+        }
+    }
+
+    fun getDrawable(): Drawable {
+        check(obtain()) { "Recycled!" }
+        return mObtainedDrawable as Drawable
+    }
+
 //    fun render(
 //        srcX: Int, srcY: Int, dst: Bitmap, dstX: Int, dstY: Int,
 //        width: Int, height: Int
@@ -169,20 +193,36 @@ class Image private constructor(
 
     fun texImage(init: Boolean, offsetX: Int, offsetY: Int, width: Int, height: Int) {
         check(!hardware) { "Hardware buffer cannot be used in glgallery" }
-        val bitmap: Bitmap = if (animated) {
-            updateBitmap()
-            mBitmap!!
-        } else {
-            (mObtainedDrawable as BitmapDrawable).bitmap
+        try {
+            val bitmap: Bitmap = if (animated) {
+                updateBitmap()
+                mBitmap!!
+            } else {
+                if (mObtainedDrawable == null) {
+                    return
+                }
+                if (mObtainedDrawable is BitmapDrawable){
+                    (mObtainedDrawable as BitmapDrawable).bitmap
+                }else{
+                    val stickerBitmap = Bitmap.createBitmap(mObtainedDrawable!!.intrinsicWidth, mObtainedDrawable!!.intrinsicHeight, Bitmap.Config.ARGB_8888)
+                    val canvas = Canvas(stickerBitmap)
+                    mObtainedDrawable!!.setBounds(0, 0, stickerBitmap.width, stickerBitmap.height)
+                    mObtainedDrawable!!.draw(canvas)
+                    stickerBitmap
+                }
+            }
+            nativeTexImage(
+                bitmap,
+                init,
+                offsetX,
+                offsetY,
+                width,
+                height
+            )
+        }catch (e:ClassCastException){
+            FirebaseCrashlytics.getInstance().recordException(e)
+            return
         }
-        nativeTexImage(
-            bitmap,
-            init,
-            offsetX,
-            offsetY,
-            width,
-            height
-        )
     }
 
     fun start() {
@@ -200,6 +240,7 @@ class Image private constructor(
             return 0
         }
 
+    @get:SuppressWarnings("deprecation")
     val isOpaque: Boolean
         get() {
             return mObtainedDrawable?.opacity == PixelFormat.OPAQUE

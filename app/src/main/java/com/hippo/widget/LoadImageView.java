@@ -16,16 +16,11 @@
 
 package com.hippo.widget;
 
-import static com.hippo.ehviewer.client.EhUrl.DOMAIN_E;
-import static com.hippo.ehviewer.client.EhUrl.DOMAIN_EX;
-
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.AnimatedImageDrawable;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
@@ -37,20 +32,31 @@ import android.view.View;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.hippo.conaco.Conaco;
 import com.hippo.conaco.ConacoTask;
+import com.hippo.conaco.DataContainer;
 import com.hippo.conaco.Unikery;
 import com.hippo.drawable.PreciselyClipDrawable;
 import com.hippo.ehviewer.EhApplication;
+import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.R;
-import com.hippo.lib.image.ImageBitmap;
+import com.hippo.ehviewer.client.EhCacheKeyFactory;
+import com.hippo.ehviewer.client.EhClient;
+import com.hippo.ehviewer.client.EhRequest;
+import com.hippo.ehviewer.client.EhUrl;
+import com.hippo.ehviewer.client.data.GalleryDetail;
+import com.hippo.ehviewer.dao.DownloadInfo;
+import com.hippo.ehviewer.ui.scene.download.DownloadsScene;
+import com.hippo.lib.image.Image;
+import com.hippo.lib.yorozuya.IntIdGenerator;
 import com.hippo.util.DrawableManager;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-public class LoadImageView extends FixedAspectImageView implements Unikery<ImageBitmap>,
+public class LoadImageView extends FixedAspectImageView implements Unikery<Image>,
         View.OnClickListener, View.OnLongClickListener, Animatable {
 
     public static final int RETRY_TYPE_NONE = 0;
@@ -58,7 +64,7 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     public static final int RETRY_TYPE_LONG_CLICK = 2;
     private static final String TAG = LoadImageView.class.getSimpleName();
     private int mTaskId = Unikery.INVALID_ID;
-    private Conaco<ImageBitmap> mConaco;
+    private Conaco<Image> mConaco;
     private String mKey;
     private String mUrl;
     private boolean mUseNetwork;
@@ -69,6 +75,11 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     private int mRetryType;
     public boolean mFailed;
     private boolean mLoadFromDrawable;
+    private boolean secondTry = false;
+    @Nullable
+    private DownloadInfo downloadInfo = null;
+
+    private int mRequestId = IntIdGenerator.INVALID_ID;
 
     public LoadImageView(Context context) {
         super(context);
@@ -137,8 +148,7 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
 
     private Drawable getImageDrawable() {
         Drawable drawable = getDrawable();
-        if (drawable instanceof TransitionDrawable) {
-            TransitionDrawable transitionDrawable = (TransitionDrawable) drawable;
+        if (drawable instanceof TransitionDrawable transitionDrawable) {
             if (transitionDrawable.getNumberOfLayers() == 2) {
                 drawable = transitionDrawable.getDrawable(1);
             }
@@ -150,11 +160,6 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     }
 
     private void clearDrawable() {
-//        // Recycle ImageDrawable
-//        ImageDrawable imageDrawable = getImageDrawable();
-//        if (imageDrawable != null) {
-//            imageDrawable.recycle();
-//        }
 
         // Set drawable null
         setImageDrawable(null);
@@ -211,7 +216,18 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         load(key, url, true);
     }
 
+    public void load(String key, String url, boolean useNetwork, DownloadInfo downloadInfo) {
+        this.downloadInfo = downloadInfo;
+        load(key, url, useNetwork);
+    }
+
+
+
     public void load(String key, String url, boolean useNetwork) {
+        load(key,url,null,useNetwork);
+    }
+
+    public void load(String key, String url, DataContainer dataContainer, boolean useNetwork) {
         if (url == null || key == null) {
             return;
         }
@@ -224,11 +240,14 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         mUrl = url;
         mUseNetwork = useNetwork;
 
-        ConacoTask.Builder<ImageBitmap> builder = new ConacoTask.Builder<ImageBitmap>()
+        ConacoTask.Builder<Image> builder = new ConacoTask.Builder<Image>()
                 .setUnikery(this)
                 .setKey(key)
                 .setUrl(url)
                 .setUseNetwork(useNetwork);
+        if (dataContainer!=null){
+            builder.setDataContainer(dataContainer);
+        }
 
         mConaco.load(builder);
     }
@@ -275,7 +294,7 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     }
 
     @Override
-    public boolean onGetValue(@NonNull ImageBitmap value, int source) {
+    public boolean onGetValue(@NonNull Image value, int source) {
         Drawable drawable;
         try {
             drawable = value.getDrawable();
@@ -285,9 +304,11 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
             return false;
         }
 
-//        clearDrawable();
-
         if (Integer.MIN_VALUE != mOffsetX) {
+            Drawable.ConstantState state = value.getDrawable().getConstantState();
+            if (state != null) {
+                drawable = state.newDrawable();
+            }
             drawable = new PreciselyClipDrawable(drawable, mOffsetX, mOffsetY, mClipWidth, mClipHeight);
         }
 
@@ -324,10 +345,26 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         } else if (mRetryType == RETRY_TYPE_LONG_CLICK) {
             setOnLongClickListener(this);
         } else {
+            if (secondTry && downloadInfo != null) {
+                Context context = this.getContext();
+                if (EhApplication.getInstance().containGlobalStuff(mRequestId)) {
+                    // request exist
+                    return;
+                }
+                String detailUrl = EhUrl.getGalleryDetailUrl(downloadInfo.gid, downloadInfo.token);
+                GalleryDetailCallback callback = new GalleryDetailCallback(context);
+                mRequestId = ((EhApplication) context.getApplicationContext()).putGlobalStuff(callback);
+                EhRequest request = new EhRequest()
+                        .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
+                        .setArgs(detailUrl)
+                        .setCallback(callback);
+                EhApplication.getEhClient(context).execute(request);
+            }
             // Can't retry, so release
             mKey = null;
             mUrl = null;
         }
+
     }
 
     @Override
@@ -383,8 +420,46 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     public void onPreSetImageResource(int resId, boolean isTarget) {
     }
 
+
+
     @IntDef({RETRY_TYPE_NONE, RETRY_TYPE_CLICK, RETRY_TYPE_LONG_CLICK})
     @Retention(RetentionPolicy.SOURCE)
     private @interface RetryType {
+    }
+
+    private class GalleryDetailCallback implements EhClient.Callback<GalleryDetail> {
+        private final Context context;
+        private final EhApplication ehApplication;
+
+        private GalleryDetailCallback(Context context) {
+            this.context = context;
+            this.ehApplication = (EhApplication) context.getApplicationContext();
+        }
+
+        @Override
+        public void onSuccess(GalleryDetail result) {
+            ehApplication.removeGlobalStuff(this);
+            secondTry = true;
+            if (context == null||result == null || downloadInfo == null) {
+                return;
+            }
+            // Put gallery detail to cache
+            EhApplication.getGalleryDetailCache(context).put(result.gid, result);
+            if (downloadInfo.gid == result.gid && !downloadInfo.thumb.equals(result.thumb)) {
+                downloadInfo.updateInfo(result);
+                EhDB.putDownloadInfo(downloadInfo);
+                load(EhCacheKeyFactory.getThumbKey(downloadInfo.gid), downloadInfo.thumb, true);
+            }
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            ehApplication.removeGlobalStuff(this);
+        }
+
+        @Override
+        public void onCancel() {
+            ehApplication.removeGlobalStuff(this);
+        }
     }
 }
