@@ -1,20 +1,3 @@
-/*
- * Copyright 2022 Tarsin Norbin
- *
- * This file is part of EhViewer
- *
- * EhViewer is free software: you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * EhViewer is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with EhViewer.
- * If not, see <https://www.gnu.org/licenses/>.
- */
 package com.hippo.lib.image
 
 import android.content.res.Resources
@@ -40,6 +23,10 @@ import java.io.FileInputStream
 import java.nio.channels.FileChannel
 import kotlin.math.max
 import kotlin.math.min
+import androidx.core.graphics.createBitmap
+import com.hippo.Native
+import okio.BufferedSource
+import java.nio.ByteBuffer
 
 class Image private constructor(
     source: FileInputStream?,
@@ -73,8 +60,8 @@ class Image private constructor(
                             // Sadly we must use software memory since we need copy it to tile buffer, fuck glgallery
                             // Idk it will cause how much performance regression
                             val screenSize = min(
-                                info.size.width / (2 * screenWidth),
-                                info.size.height / (2 * screenHeight)
+                                info.size.width / screenWidth,
+                                info.size.height / screenHeight
                             ).coerceAtLeast(1)
                             decoder.setTargetSampleSize(
                                 max(screenSize, simpleSize ?: 1)
@@ -115,7 +102,7 @@ class Image private constructor(
         ?: mObtainedDrawable!!.intrinsicHeight
     val isRecycled = mObtainedDrawable == null
 
-    var started = false
+    private var started = false
 
     @Synchronized
     fun recycle() {
@@ -137,7 +124,7 @@ class Image private constructor(
 
     private fun prepareBitmap() {
         if (mBitmap != null) return
-        mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        mBitmap = createBitmap(width, height)
     }
 
     private fun updateBitmap() {
@@ -168,29 +155,6 @@ class Image private constructor(
         return mObtainedDrawable as Drawable
     }
 
-//    fun render(
-//        srcX: Int, srcY: Int, dst: Bitmap, dstX: Int, dstY: Int,
-//        width: Int, height: Int
-//    ) {
-//        check(!hardware) { "Hardware buffer cannot be used in glgallery" }
-//        val bitmap: Bitmap = if (animated) {
-//            updateBitmap()
-//            mBitmap!!
-//        } else {
-//            (mObtainedDrawable as BitmapDrawable).bitmap
-//        }
-//        nativeRender(
-//            bitmap,
-//            srcX,
-//            srcY,
-//            dst,
-//            dstX,
-//            dstY,
-//            width,
-//            height
-//        )
-//    }
-
     fun texImage(init: Boolean, offsetX: Int, offsetY: Int, width: Int, height: Int) {
         check(!hardware) { "Hardware buffer cannot be used in glgallery" }
         try {
@@ -201,10 +165,13 @@ class Image private constructor(
                 if (mObtainedDrawable == null) {
                     return
                 }
-                if (mObtainedDrawable is BitmapDrawable){
+                if (mObtainedDrawable is BitmapDrawable) {
                     (mObtainedDrawable as BitmapDrawable).bitmap
-                }else{
-                    val stickerBitmap = Bitmap.createBitmap(mObtainedDrawable!!.intrinsicWidth, mObtainedDrawable!!.intrinsicHeight, Bitmap.Config.ARGB_8888)
+                } else {
+                    val stickerBitmap = createBitmap(
+                        mObtainedDrawable!!.intrinsicWidth,
+                        mObtainedDrawable!!.intrinsicHeight
+                    )
                     val canvas = Canvas(stickerBitmap)
                     mObtainedDrawable!!.setBounds(0, 0, stickerBitmap.width, stickerBitmap.height)
                     mObtainedDrawable!!.draw(canvas)
@@ -219,7 +186,7 @@ class Image private constructor(
                 width,
                 height
             )
-        }catch (e:ClassCastException){
+        } catch (e: ClassCastException) {
             FirebaseCrashlytics.getInstance().recordException(e)
             return
         }
@@ -236,7 +203,7 @@ class Image private constructor(
     val delay: Int
         get() {
             if (animated)
-                return 50
+                return 10
             return 0
         }
 
