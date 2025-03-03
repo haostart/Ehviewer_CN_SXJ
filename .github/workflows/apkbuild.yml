@@ -3,10 +3,10 @@ name: Daily Android Build
 # 控制何时触发工作流
 on:
   schedule:
-    - cron: '0 0 * * *' # 每天 UTC 时间午夜执行
-  push:
-    branches:
-      - dev
+    - cron: '0 2 * * *' # 每天 UTC 时间午夜执行
+#  push:
+#    branches:
+#      - dev
   # 允许手动触发
   workflow_dispatch:
 

@@ -3,9 +3,9 @@ name: Sync Upstream
 on:
   schedule:
     - cron: '0 1 * * *'  # 每天凌晨1点运行
-  push:
-    branches:
-      - dev
+#  push:
+#    branches:
+#      - dev
   # 允许手动触发
   workflow_dispatch:
 jobs:
