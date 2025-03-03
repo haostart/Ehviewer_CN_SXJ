@@ -22,11 +22,11 @@ jobs:
           ref: 'dev'  # 指定使用 dev 分支
 
       # 设置 Java 环境
-      - name: Set up JDK 11
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '17'
 
       # 缓存 Gradle 依赖项以加快构建速度
       - name: Cache Gradle packages
