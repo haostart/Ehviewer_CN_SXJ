@@ -28,8 +28,18 @@ jobs:
           git merge upstream/BiLi_PC_Gamer --no-commit --no-ff
         continue-on-error: false  # 如果合并失败，Action会停止执行
 
+      - name: Check if there are changes
+        id: check_changes
+        run: |
+          CHANGES=$(git status --porcelain)
+          if [ -n "$CHANGES" ]; then
+            echo "::set-output name=has_changes::true"
+          else
+            echo "::set-output name=has_changes::false"
+          fi
+
       - name: Commit and push if there are changes
-        if: success() && contains(toJSON(git status --porcelain), 'M')
+        if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           git commit -am "Sync with upstream BiLi_PC_Gamer"
           git push origin main  # 推送到你的远程仓库的main分支
