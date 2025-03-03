@@ -24,7 +24,7 @@ jobs:
 
       - name: Merge upstream changes
         run: |
-          git checkout main  # 假设你想合并到main分支，如果不是，请更改为对应的分支名
+          git checkout dev
           git merge upstream/BiLi_PC_Gamer --no-commit --no-ff
         continue-on-error: false  # 如果合并失败，Action会停止执行
 
@@ -42,7 +42,7 @@ jobs:
         if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           git commit -am "Sync with upstream BiLi_PC_Gamer"
-          git push origin main  # 推送到你的远程仓库的main分支
+          git push origin dev  # 推送到你的远程仓库的main分支
 
       - name: Notify on failure
         if: failure()
