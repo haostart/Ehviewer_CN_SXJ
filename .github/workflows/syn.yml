@@ -3,38 +3,36 @@ name: Sync Upstream
 on:
   schedule:
     - cron: '0 1 * * *'  # 每天凌晨1点运行
-#  push:
-#    branches:
-#      - dev
-  # 允许手动触发
-  workflow_dispatch:
+  workflow_dispatch:  # 允许手动触发
+
 jobs:
   sync:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout your fork
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0  # 获取完整的提交历史，以便能够合并
 
       - name: Set upstream remote
         run: |
-          git remote add upstream https://github.com/xiaojieonly/Ehviewer_CN_SXJ.git  
-          git fetch upstream  
-          git config --global user.email "haostart@hotmail.com"  
-          git config --global user.name "haostart"  
+          git remote add upstream https://github.com/xiaojieonly/Ehviewer_CN_SXJ.git
+          git fetch upstream
+          git config --global user.email "haostart@hotmail.com"
+          git config --global user.name "haostart"
 
       - name: Merge upstream changes
         run: |
-          git checkout dev  # 假设你想合并到main分支，如果不是，请更改为对应的分支名
+          git checkout main  # 假设你想合并到main分支，如果不是，请更改为对应的分支名
           git merge upstream/BiLi_PC_Gamer --no-commit --no-ff
         continue-on-error: false  # 如果合并失败，Action会停止执行
 
       - name: Commit and push if there are changes
         if: success() && contains(toJSON(git status --porcelain), 'M')
         run: |
-          git commit -am "Sync with upstream BiLi_PC_Gamer"  
-          git push origin dev  # 推送到你的远程仓库的main分支
+          git commit -am "Sync with upstream BiLi_PC_Gamer"
+          git push origin main  # 推送到你的远程仓库的main分支
 
       - name: Notify on failure
         if: failure()
