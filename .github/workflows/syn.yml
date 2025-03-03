@@ -40,9 +40,11 @@ jobs:
 
       - name: Commit and push if there are changes
         if: steps.check_changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           git commit -am "Sync with upstream BiLi_PC_Gamer"
-          git push origin dev  # 推送到你的远程仓库的main分支
+          git push https://${{ secrets.GH_TOKEN }}@github.com/haostart/Ehviewer_CN_SXJ.git dev
 
       - name: Notify on failure
         if: failure()
