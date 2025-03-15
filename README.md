@@ -12,7 +12,7 @@ An E-Hentai Application for Android.
 
 点击前往下载：
 
-[//]: # (- [Appteka]&#40;https://appteka.store/app/9b1r203934&#41;)
+- [Appteka](https://appteka.store/app/d52r213275)
 - [百度云](https://pan.baidu.com/s/1AFJ-ZMx7sjg8GArG5GuawQ) 提取码：8jik
 - [蓝奏云](https://wwsu.lanzouu.com/iXlQc2p6sx2h) 提取码：3bq2
 - [GitHub](https://github.com/xiaojieonly/Ehviewer_CN_SXJ/releases)
@@ -22,6 +22,7 @@ An E-Hentai Application for Android.
 
 - [要饭嘛不寒掺](https://github.com/xiaojieonly/Ehviewer_CN_SXJ/blob/BiLi_PC_Gamer/feedauthor/support.md)
 
+唯一X账号：https://x.com/Sherloc21784244    
 Telegram群: https://t.me/+WyclP8pPlk-JfbwS    
 Telegram通知群: https://t.me/Ehviewer_xiaojieonly_channel
 
