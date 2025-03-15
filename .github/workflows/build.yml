@@ -20,6 +20,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 21
+      - name: Clear Gradle Cache
+        run: ./gradlew clean
 
       - name: Build
         run: |
